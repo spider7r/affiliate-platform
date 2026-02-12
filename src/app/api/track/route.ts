@@ -42,13 +42,14 @@ export async function GET(request: Request) {
         })
 
         // Increment total clicks on the affiliate
-        await supabase.rpc('increment_clicks', { affiliate_id_input: affiliate.id }).catch(() => {
-            // Fallback if RPC doesn't exist — direct update
-            supabase
+        const { error: rpcError } = await supabase.rpc('increment_clicks', { affiliate_id_input: affiliate.id })
+        if (rpcError) {
+            // Fallback: direct update if RPC doesn't exist
+            await supabase
                 .from('affiliates')
-                .update({ total_clicks: (affiliate as any).total_clicks ? (affiliate as any).total_clicks + 1 : 1 })
+                .update({ total_clicks: 1 })
                 .eq('id', affiliate.id)
-        })
+        }
     }
 
     // Redirect to main app with ref code preserved
