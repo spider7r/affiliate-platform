@@ -118,7 +118,7 @@ export function AdminDashboard({ affiliates, allReferrals, allPayoutMethods, all
             </aside>
 
             {/* ── Main ── */}
-            < main className="flex-1 ml-[280px]" >
+            <main className="flex-1 ml-[280px]">
                 <header className="sticky top-0 z-30 border-b border-white/[0.06] bg-[#050505]/60 backdrop-blur-2xl">
                     <div className="px-8 h-[72px] flex items-center justify-between">
                         <div>
