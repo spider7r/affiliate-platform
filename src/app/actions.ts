@@ -18,19 +18,19 @@ export async function registerAffiliate(formData: FormData) {
         return { error: 'Password must be at least 6 characters' }
     }
 
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    const adminClient = createAdminClient()
+
+    // Use Admin API to create user with auto-confirmation (bypasses email sending)
+    const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
         email,
         password,
-        options: {
-            data: { full_name: fullName },
-            emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001'}/auth/callback`
-        }
+        email_confirm: true,
+        user_metadata: { full_name: fullName }
     })
 
     if (authError) return { error: authError.message }
 
     if (authData.user) {
-        const adminClient = createAdminClient()
         // Generate a unique referral code
         const code = fullName.split(' ')[0].toUpperCase().slice(0, 6) + Math.random().toString(36).substring(2, 6).toUpperCase()
 
@@ -46,6 +46,13 @@ export async function registerAffiliate(formData: FormData) {
         if (insertError) {
             console.error('Affiliate insert error:', insertError)
             return { error: 'Failed to create affiliate profile. Please contact support.' }
+        }
+
+        // Auto-login the user after creation
+        const { error: loginError } = await supabase.auth.signInWithPassword({ email, password })
+        if (loginError) {
+            // Should not happen, but if it does, redirect to login
+            return { success: true, redirect: '/login' }
         }
     }
 
