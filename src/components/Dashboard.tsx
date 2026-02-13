@@ -380,7 +380,11 @@ export function Dashboard({ affiliate, referralCount, clickCount, recentReferral
                                     <AnimatePresence>
                                         {addingMethod && (
                                             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-                                                <form action={addPayoutMethod} className="border border-white/[0.06] bg-white/[0.01] rounded-2xl p-6 mt-5 space-y-4">
+                                                <form action={async (formData) => {
+                                                    const res = await addPayoutMethod(formData)
+                                                    if (res?.error) alert(res.error) // Simple alert for now, can be toast
+                                                    if (res?.success) setAddingMethod(null)
+                                                }} className="border border-white/[0.06] bg-white/[0.01] rounded-2xl p-6 mt-5 space-y-4">
                                                     <input type="hidden" name="method_type" value={addingMethod} />
                                                     {addingMethod === 'bank_transfer' && (<div className="grid grid-cols-2 gap-4">
                                                         {[{ n: 'bank_name', l: 'Bank Name', p: 'e.g. JPMorgan Chase' }, { n: 'account_holder', l: 'Account Holder', p: 'Full name' }, { n: 'account_number', l: 'Account Number', p: 'Account number' }, { n: 'routing_number', l: 'Routing Number', p: 'Routing number' }].map(f => (
