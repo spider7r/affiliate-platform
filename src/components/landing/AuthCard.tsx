@@ -29,6 +29,10 @@ export function AuthCard({ initialView = 'login' }: AuthCardProps) {
                     window.location.href = result.redirect
                 } else {
                     setSuccess(true)
+                    // Wait a moment for the success animation then redirect
+                    setTimeout(() => {
+                        window.location.href = '/dashboard'
+                    }, 2000)
                 }
             } else {
                 const result = await loginAffiliate(formData)

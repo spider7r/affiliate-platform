@@ -73,8 +73,8 @@ export async function loginAffiliate(formData: FormData) {
 
     if (error) return { error: error.message }
 
-    revalidatePath('/')
-    redirect('/')
+    revalidatePath('/dashboard')
+    redirect('/dashboard')
 }
 
 export async function logoutAffiliate() {
