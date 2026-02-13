@@ -20,11 +20,33 @@ export default async function DashboardPage() {
         .single()
 
     if (!affiliate) {
-        // Edge case: User logged in but no affiliate profile. 
-        // Could redirect to a setup page, but for now redirecting to home/login might be safer or showing an error.
-        // Let's redirect to login to force a clear state or contact support.
-        // actually, let's just let them see an empty state or redirect to root
-        redirect('/')
+        // Check if admin
+        const adminEmail = process.env.ADMIN_EMAIL || 'admin@thetradal.com'
+        if (user.email === adminEmail) {
+            redirect('/admin')
+        }
+
+        // If not admin and not affiliate, sign them out or show error
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-[#050505] text-white p-4">
+                <div className="max-w-md text-center space-y-4">
+                    <h1 className="text-2xl font-bold text-red-500">Access Denied</h1>
+                    <p className="text-white/60">
+                        No affiliate profile found for this account. Please contact support or register as a new partner.
+                    </p>
+                    <form action={async () => {
+                        'use server'
+                        const supabase = await createClient()
+                        await supabase.auth.signOut()
+                        redirect('/login')
+                    }}>
+                        <button className="bg-white/10 hover:bg-white/20 px-6 py-2 rounded-lg text-sm font-medium transition-colors">
+                            Sign Out
+                        </button>
+                    </form>
+                </div>
+            </div>
+        )
     }
 
     // 2. Get referrals
