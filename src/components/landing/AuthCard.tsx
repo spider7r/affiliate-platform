@@ -42,7 +42,7 @@ export function AuthCard() {
         <div className="w-full max-w-[440px] mx-auto relative z-10">
             {/* Logo */}
             <div className="text-center mb-8">
-                <Image src="/tradalpartner.png" alt="Tradal Partners" width={200} height={60} className="mx-auto object-contain" />
+                <Image src="/partnerslogo.png" alt="Tradal Partners" width={200} height={60} className="mx-auto object-contain" />
             </div>
 
             {/* Card */}

@@ -16,7 +16,7 @@ export function Navbar() {
                 <div className="bg-[#0A0A0A]/80 backdrop-blur-xl border border-white/[0.06] rounded-2xl px-6 py-3 flex items-center justify-between shadow-2xl shadow-black/50">
                     <div className="flex items-center gap-2">
                         <div className="flex items-center gap-2">
-                            <Image src="/tradalpartner.png" alt="Tradal Partners" width={140} height={40} className="relative object-contain" />
+                            <Image src="/partnerslogo.png" alt="Tradal Partners" width={140} height={40} className="relative object-contain" />
                         </div>
                     </div>
 
