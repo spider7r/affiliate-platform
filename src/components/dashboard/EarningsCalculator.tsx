@@ -21,8 +21,8 @@ export default function EarningsCalculator({ commissionRate = 20 }: EarningsCalc
             try {
                 const data = await getLivePricing()
                 setPlans(data)
-                // Select "Pro" by default, or the middle/second plan
-                const defaultPlan = data.find(p => p.name === 'Pro') || data[1] || data[0]
+                // Select "GROWTH" by default, or the middle/second plan
+                const defaultPlan = data.find(p => p.name === 'GROWTH') || data[1] || data[0]
                 setSelectedPlan(defaultPlan)
             } catch (error) {
                 console.error('Failed to fetch price:', error)

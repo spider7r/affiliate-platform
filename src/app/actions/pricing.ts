@@ -24,9 +24,9 @@ export async function getLivePricing(): Promise<Plan[]> {
         console.error('Error fetching plans:', error)
         // Fallback
         return [
-            { id: '1', name: 'Starter', price: 29.00, currency: 'USD', interval: 'month' },
-            { id: '2', name: 'Pro', price: 49.00, currency: 'USD', interval: 'month' },
-            { id: '3', name: 'Premium', price: 99.00, currency: 'USD', interval: 'month' }
+            { id: '1', name: 'STARTER', price: 29.00, currency: 'USD', interval: 'month' },
+            { id: '2', name: 'GROWTH', price: 49.00, currency: 'USD', interval: 'month' },
+            { id: '3', name: 'ENTERPRISE', price: 99.00, currency: 'USD', interval: 'month' }
         ]
     }
 
