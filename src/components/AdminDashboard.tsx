@@ -11,6 +11,7 @@ import {
     Filter, Sparkles
 } from 'lucide-react'
 import { updateCommission, updateAffiliateStatus, processPayoutAction } from '@/app/admin/actions'
+import { logoutAffiliate } from '@/app/actions'
 import Image from 'next/image'
 
 interface AdminDashboardProps {
@@ -108,11 +109,17 @@ export function AdminDashboard({ affiliates, allReferrals, allPayoutMethods, all
                             </div>
                         </div>
                     </div>
+                    <form action={logoutAffiliate}>
+                        <button type="submit" className="w-full flex items-center gap-2 px-4 py-2.5 mt-2 text-[12px] text-white/30 hover:text-red-400 transition-all rounded-xl hover:bg-red-500/5">
+                            <LogOut className="w-3.5 h-3.5" /> Sign Out
+                        </button>
+                    </form>
                 </div>
-            </aside>
+        </div>
+            </aside >
 
-            {/* ── Main ── */}
-            <main className="flex-1 ml-[280px]">
+        {/* ── Main ── */ }
+        < main className = "flex-1 ml-[280px]" >
                 <header className="sticky top-0 z-30 border-b border-white/[0.06] bg-[#050505]/60 backdrop-blur-2xl">
                     <div className="px-8 h-[72px] flex items-center justify-between">
                         <div>
@@ -567,7 +574,7 @@ export function AdminDashboard({ affiliates, allReferrals, allPayoutMethods, all
 
                     </AnimatePresence>
                 </div>
-            </main>
-        </div>
+            </main >
+        </div >
     )
 }
