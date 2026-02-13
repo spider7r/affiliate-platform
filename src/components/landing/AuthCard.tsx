@@ -6,8 +6,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Loader2, ArrowRight, CheckCircle2, Mail, Lock, User, Sparkles } from 'lucide-react'
 import Image from 'next/image'
 
-export function AuthCard() {
-    const [isRegister, setIsRegister] = useState(false)
+interface AuthCardProps {
+    initialView?: 'login' | 'register'
+}
+
+export function AuthCard({ initialView = 'login' }: AuthCardProps) {
+    const [isRegister, setIsRegister] = useState(initialView === 'register')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState(false)

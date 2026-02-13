@@ -3,7 +3,9 @@
 import { Navbar } from './Navbar'
 import { Hero } from './Hero'
 import { Features } from './Features'
-import { AuthSection } from './AuthSection'
+import { HowItWorks } from './HowItWorks'
+import { FAQ } from './FAQ'
+import { CTA } from './CTA'
 import { Footer } from './Footer'
 
 export function LandingPage() {
@@ -12,7 +14,9 @@ export function LandingPage() {
             <Navbar />
             <Hero />
             <Features />
-            <AuthSection />
+            <HowItWorks />
+            <FAQ />
+            <CTA />
             <Footer />
         </div>
     )

@@ -22,10 +22,8 @@ import {
 import Image from 'next/image';
 
 export function Hero() {
-    const REGISTER_ID = "auth-section";
-
-    const scrollToAuth = () => {
-        document.getElementById(REGISTER_ID)?.scrollIntoView({ behavior: 'smooth' });
+    const handleStartEarning = () => {
+        window.location.href = '/signup';
     };
 
     return (
@@ -109,7 +107,7 @@ export function Hero() {
                     <Button
                         variant="primary"
                         size="lg"
-                        onClick={scrollToAuth}
+                        onClick={handleStartEarning}
                         className="w-full sm:w-auto h-14 px-4 sm:px-10 text-base sm:text-lg font-extrabold flex items-center justify-center whitespace-nowrap"
                     >
                         START EARNING NOW

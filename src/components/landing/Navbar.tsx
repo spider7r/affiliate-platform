@@ -18,8 +18,8 @@ export function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const scrollToAuth = () => {
-        document.getElementById('auth-section')?.scrollIntoView({ behavior: 'smooth' });
+    const handleStartEarning = () => {
+        window.location.href = '/signup';
         setIsMobileMenuOpen(false);
     };
 
@@ -85,7 +85,7 @@ export function Navbar() {
                             </div>
 
                             <button
-                                onClick={scrollToAuth}
+                                onClick={handleStartEarning}
                                 className="flex items-center px-5 py-2.5 bg-white text-black rounded-full font-bold text-sm hover:bg-[#00E676] hover:text-black transition-all duration-300 shadow-lg shadow-white/10"
                             >
                                 <Sparkles className="w-4 h-4 mr-2" />
@@ -128,7 +128,7 @@ export function Navbar() {
                     </div>
 
                     <button
-                        onClick={scrollToAuth}
+                        onClick={handleStartEarning}
                         className="w-full py-5 bg-gradient-to-r from-[#00E676] to-[#00c764] rounded-2xl text-black font-bold text-xl mt-auto relative overflow-hidden group"
                     >
                         <div className="absolute inset-0 bg-white/40 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
