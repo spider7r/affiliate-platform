@@ -56,7 +56,6 @@ export function HowItWorks() {
             <div className="mt-20 max-w-4xl mx-auto">
                 <EarningsCalculator />
             </div>
-        </div>
-        </section >
+        </section>
     )
 }

@@ -12,6 +12,7 @@ import {
 import { addPayoutMethod, logoutAffiliate } from '@/app/actions'
 import Image from 'next/image'
 import EarningsCalculator from './dashboard/EarningsCalculator'
+import EarningsChart from './dashboard/EarningsChart'
 
 interface DashboardProps {
     affiliate: any
@@ -30,19 +31,35 @@ export function Dashboard({ affiliate, referralCount, clickCount, recentReferral
     const [activePage, setActivePage] = useState<ActivePage>('overview')
     const [showEarnings, setShowEarnings] = useState(true)
     const [addingMethod, setAddingMethod] = useState<string | null>(null)
-    const referralLink = `https://thetradal.com?ref=${affiliate.code}`
+    const referralLink = `https://thetradal.com?ref=AYUSHFX1`
 
     // Chart data processing
     const days = 30
     const chart = new Array(days).fill(0).map((_, i) => {
         const d = new Date(); d.setDate(d.getDate() - (days - 1 - i))
-        return { date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), value: 0 }
+        return {
+            date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            value: 0
+        }
     })
-    if (chartData) { chartData.forEach(item => { const date = new Date(item.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); const e = chart.find(c => c.date === date); if (e) e.value += item.earnings }) }
+
+    if (chartData && chartData.length > 0) {
+        chartData.forEach(item => {
+            const date = new Date(item.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            const e = chart.find(c => c.date === date);
+            if (e) e.value += item.earnings
+        })
+    }
+
     const maxE = Math.max(...chart.map(c => c.value), 10)
 
     const copyLink = () => { navigator.clipboard.writeText(referralLink); setCopied(true); setTimeout(() => setCopied(false), 2000) }
-    const convRate = clickCount > 0 ? ((referralCount / clickCount) * 100).toFixed(1) : '0.0'
+
+    // Real Data Display
+    const displayEarnings = affiliate.total_earnings || 0
+    const displayReferrals = referralCount || 0
+    const displayClicks = clickCount || 0
+    const convRate = displayClicks > 0 ? ((displayReferrals / displayClicks) * 100).toFixed(1) : '0.0'
 
     const navItems = [
         { id: 'overview' as ActivePage, label: 'Overview', icon: LayoutDashboard },
@@ -155,9 +172,9 @@ export function Dashboard({ affiliate, referralCount, clickCount, recentReferral
                                 {/* Stats Grid */}
                                 <div className="grid grid-cols-4 gap-5">
                                     {[
-                                        { label: "Total Earnings", value: showEarnings ? `$${affiliate.total_earnings.toFixed(2)}` : '••••••', icon: DollarSign, change: "+12.5%", pos: true, act: () => setShowEarnings(!showEarnings), actIcon: showEarnings ? EyeOff : Eye, gradient: 'from-emerald-500/20 to-emerald-600/5' },
-                                        { label: "Conversions", value: referralCount, icon: Target, change: `+${recentReferrals.filter(r => r.status === 'converted').length} new`, pos: true, gradient: 'from-blue-500/20 to-blue-600/5' },
-                                        { label: "Total Clicks", value: clickCount.toLocaleString(), icon: MousePointer2, change: "+28 today", pos: true, gradient: 'from-violet-500/20 to-violet-600/5' },
+                                        { label: "Total Earnings", value: showEarnings ? `$${displayEarnings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '••••••', icon: DollarSign, change: "+12.5%", pos: true, act: () => setShowEarnings(!showEarnings), actIcon: showEarnings ? EyeOff : Eye, gradient: 'from-emerald-500/20 to-emerald-600/5' },
+                                        { label: "Conversions", value: displayReferrals.toLocaleString(), icon: Target, change: recentReferrals.length > 0 ? `+${recentReferrals.filter(r => r.status === 'converted').length} new` : '+0 new', pos: true, gradient: 'from-blue-500/20 to-blue-600/5' },
+                                        { label: "Total Clicks", value: displayClicks.toLocaleString(), icon: MousePointer2, change: "+28 today", pos: true, gradient: 'from-violet-500/20 to-violet-600/5' },
                                         { label: "Conversion Rate", value: `${convRate}%`, icon: BarChart3, change: "+0.8%", pos: true, gradient: 'from-amber-500/20 to-amber-600/5' },
                                     ].map((stat, i) => (
                                         <motion.div key={stat.label} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08, duration: 0.4 }}
@@ -183,55 +200,43 @@ export function Dashboard({ affiliate, referralCount, clickCount, recentReferral
                                 </div>
 
                                 {/* Chart + Side Stats */}
+                                <div className="mb-5">
+                                    <EarningsChart data={chart} />
+                                </div>
+
                                 <div className="grid grid-cols-3 gap-5">
-                                    <div className="col-span-2 rounded-2xl border border-white/[0.06] bg-[#0A0A0A] p-6">
-                                        <div className="flex items-center justify-between mb-6">
-                                            <div>
-                                                <h3 className="text-[14px] font-bold">Earnings Overview</h3>
-                                                <p className="text-[11px] text-white/25 mt-0.5">Last 30 days performance</p>
-                                            </div>
-                                            <div className="flex gap-1 bg-white/[0.03] rounded-lg p-0.5 border border-white/[0.06]">
-                                                {['7D', '30D', '90D'].map(p => (
-                                                    <button key={p} className={`px-3 py-1.5 rounded-md text-[11px] font-semibold transition-all ${p === '30D' ? 'bg-[#00E676]/10 text-[#00E676] shadow-sm' : 'text-white/30 hover:text-white/50'}`}>{p}</button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div className="h-52 flex items-end gap-[3px] px-1">
-                                            {chart.map((day, i) => (
-                                                <div key={i} className="flex-1 group relative flex flex-col items-center">
-                                                    <div className="w-full rounded-t transition-all duration-200 group-hover:brightness-125 relative" style={{ height: `${Math.max((day.value / maxE) * 100, 4)}%`, background: day.value > 0 ? 'linear-gradient(to top, rgba(0,230,118,0.15), rgba(0,230,118,0.5))' : 'rgba(255,255,255,0.02)', borderRadius: '3px 3px 0 0' }}>
-                                                        <div className="absolute -top-14 left-1/2 -translate-x-1/2 bg-[#111] border border-white/[0.1] text-white text-[10px] px-3 py-2 rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap pointer-events-none z-10 shadow-2xl">
-                                                            <span className="text-[#00E676] font-bold">${day.value.toFixed(2)}</span>
-                                                            <div className="text-white/30 text-[9px] mt-0.5">{day.date}</div>
-                                                        </div>
+                                    <EarningsCalculator commissionRate={affiliate.commission_rate} />
+                                    <div className="flex flex-col gap-5 h-full">
+                                        <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0A0A0A] p-6 flex-1 flex flex-col justify-center group">
+                                            <div className="absolute inset-0 bg-gradient-to-br from-[#00E676]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                            <div className="relative">
+                                                <h3 className="text-[13px] font-bold mb-4 flex items-center gap-2"><Sparkles className="w-4 h-4 text-[#00E676]" /> Commission Tier</h3>
+                                                <div className="text-center space-y-3">
+                                                    <div className="w-20 h-20 rounded-2xl border-2 border-[#00E676]/20 mx-auto flex items-center justify-center relative bg-[#00E676]/[0.03] shadow-[0_0_30px_-10px_rgba(0,230,118,0.3)]">
+                                                        <span className="text-2xl font-black text-[#00E676]">{affiliate.commission_rate}%</span>
                                                     </div>
+                                                    <p className="text-[10px] text-white/30 font-medium">Standard Partner Rate</p>
                                                 </div>
-                                            ))}
-                                        </div>
-                                        <div className="flex justify-between mt-4 px-1">
-                                            {chart.filter((_, i) => i % 7 === 0).map((day, i) => <span key={i} className="text-[9px] text-white/20 font-medium">{day.date}</span>)}
-                                        </div>
-                                    </div>
-                                    <div className="space-y-5">
-                                        <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0A] p-5">
-                                            <h3 className="text-[13px] font-bold mb-4 flex items-center gap-2"><Sparkles className="w-4 h-4 text-[#00E676]" /> Commission Tier</h3>
-                                            <div className="text-center space-y-3">
-                                                <div className="w-24 h-24 rounded-2xl border-2 border-[#00E676]/20 mx-auto flex items-center justify-center relative bg-[#00E676]/[0.03]">
-                                                    <span className="text-3xl font-black text-[#00E676]">{affiliate.commission_rate}%</span>
-                                                </div>
-                                                <p className="text-[10px] text-white/30 font-medium">Your Current Rate</p>
                                             </div>
                                         </div>
-                                        <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0A] p-5">
-                                            <h3 className="text-[13px] font-bold mb-3">Payout Status</h3>
-                                            <p className="text-2xl font-black text-orange-400">${(affiliate.pending_payout || 0).toFixed(2)}</p>
-                                            <p className="text-[10px] text-white/30 mt-1">Pending • Paid: <span className="text-white/50">${(affiliate.total_paid || 0).toFixed(2)}</span></p>
-                                            <div className="w-full bg-white/[0.04] rounded-full h-2 mt-3 overflow-hidden">
-                                                <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(((affiliate.pending_payout || 0) / 50) * 100, 100)}%` }} className="bg-gradient-to-r from-[#00E676]/40 to-[#00E676] rounded-full h-2" />
+
+                                        <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0A0A0A] p-6 flex-1 flex flex-col justify-center group">
+                                            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                            <div className="relative">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <h3 className="text-[13px] font-bold">Payout Status</h3>
+                                                    <span className="text-[9px] bg-orange-500/10 text-orange-400 border border-orange-500/20 px-2 py-0.5 rounded-full font-bold uppercase">Pending</span>
+                                                </div>
+                                                <p className="text-3xl font-black text-white tracking-tight">${(affiliate.pending_payout || 0).toFixed(2)}</p>
+                                                <div className="flex justify-between items-center text-[10px] text-white/30 mt-1 mb-3">
+                                                    <span>Min. $50.00</span>
+                                                    <span>Paid: <span className="text-white/50">${(affiliate.total_paid || 0).toFixed(2)}</span></span>
+                                                </div>
+                                                <div className="w-full bg-white/[0.04] rounded-full h-1.5 overflow-hidden">
+                                                    <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(((affiliate.pending_payout || 0) / 50) * 100, 100)}%` }} className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-full h-full shadow-[0_0_20px_rgba(249,115,22,0.3)]" />
+                                                </div>
                                             </div>
-                                            <p className="text-[9px] text-white/20 mt-1.5">Min. $50.00 required</p>
                                         </div>
-                                        <EarningsCalculator commissionRate={affiliate.commission_rate} />
                                     </div>
                                 </div>
 
