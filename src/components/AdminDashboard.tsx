@@ -573,7 +573,7 @@ export function AdminDashboard({ affiliates, allReferrals, allPayoutMethods, all
 
                     </AnimatePresence>
                 </div>
-            </main >
-        </div >
+            </main>
+        </div>
     )
 }

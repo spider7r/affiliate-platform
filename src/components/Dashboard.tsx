@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { addPayoutMethod, logoutAffiliate } from '@/app/actions'
 import Image from 'next/image'
+import EarningsCalculator from './dashboard/EarningsCalculator'
 
 interface DashboardProps {
     affiliate: any
@@ -230,6 +231,7 @@ export function Dashboard({ affiliate, referralCount, clickCount, recentReferral
                                             </div>
                                             <p className="text-[9px] text-white/20 mt-1.5">Min. $50.00 required</p>
                                         </div>
+                                        <EarningsCalculator commissionRate={affiliate.commission_rate} />
                                     </div>
                                 </div>
 
