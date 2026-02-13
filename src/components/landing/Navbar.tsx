@@ -15,11 +15,9 @@ export function Navbar() {
             <div className="max-w-7xl mx-auto">
                 <div className="bg-[#0A0A0A]/80 backdrop-blur-xl border border-white/[0.06] rounded-2xl px-6 py-3 flex items-center justify-between shadow-2xl shadow-black/50">
                     <div className="flex items-center gap-2">
-                        <div className="relative w-8 h-8">
-                            <div className="absolute inset-0 bg-[#00E676] blur-lg opacity-20" />
-                            <Image src="/logo.png" alt="Tradal" width={32} height={32} className="relative object-contain" />
+                        <div className="flex items-center gap-2">
+                            <Image src="/tradalpartner.png" alt="Tradal Partners" width={140} height={40} className="relative object-contain" />
                         </div>
-                        <span className="font-bold text-lg tracking-tight">Tradal <span className="text-[#00E676]">Partners</span></span>
                     </div>
 
                     <div className="hidden md:flex items-center gap-8 text-[13px] font-medium text-white/50">
