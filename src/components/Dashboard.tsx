@@ -64,7 +64,7 @@ export function Dashboard({ affiliate, referralCount, clickCount, recentReferral
             {/* ── Sidebar ── */}
             <aside className="w-[280px] border-r border-white/[0.06] bg-[#0A0A0A]/80 backdrop-blur-2xl flex flex-col fixed h-full z-40">
                 <div className="p-6 border-b border-white/[0.06]">
-                    <Image src="/logo.png" alt="Tradal" width={160} height={48} className="object-contain" />
+                    <Image src="/partnerslogo.png" alt="Tradal Partners" width={160} height={48} className="object-contain" />
                 </div>
                 <div className="px-4 pt-5 pb-2">
                     <p className="text-[9px] text-white/30 uppercase tracking-[0.2em] font-semibold px-3">Navigation</p>

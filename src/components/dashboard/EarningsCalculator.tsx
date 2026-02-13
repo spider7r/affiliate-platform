@@ -6,10 +6,10 @@ import { Calculator, TrendingUp, Users } from 'lucide-react'
 import { getLivePricing } from '@/app/actions/pricing'
 
 interface EarningsCalculatorProps {
-    commissionRate: number
+    commissionRate?: number
 }
 
-export default function EarningsCalculator({ commissionRate }: EarningsCalculatorProps) {
+export default function EarningsCalculator({ commissionRate = 20 }: EarningsCalculatorProps) {
     const [referrals, setReferrals] = useState(10)
     const [planPrice, setPlanPrice] = useState(49)
     const [currency, setCurrency] = useState('USD')
