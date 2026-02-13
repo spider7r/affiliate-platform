@@ -1,14 +1,14 @@
 import { createClient, createAdminClient } from '@/utils/supabase/server'
 import { Dashboard } from '@/components/Dashboard'
-import { LoginForm } from '@/components/LoginForm'
+import { LandingPage } from '@/components/landing/LandingPage'
 
 export default async function Home() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Not logged in → show login form
+  // Not logged in → show landing page (which includes auth)
   if (!user) {
-    return <LoginForm />
+    return <LandingPage />
   }
 
   // Logged in → fetch real affiliate data
@@ -23,7 +23,7 @@ export default async function Home() {
 
   if (!affiliate) {
     // User exists in auth but no affiliate row yet (edge case)
-    return <LoginForm />
+    return <LandingPage />
   }
 
   // 2. Get referrals
