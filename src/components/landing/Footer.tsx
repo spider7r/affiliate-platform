@@ -39,8 +39,8 @@ export function Footer() {
                         <h4 className="text-white font-bold mb-6">Program</h4>
                         <ul className="space-y-4 text-sm text-slate-500 font-medium">
                             <li><Link href="#features" className="hover:text-[#00E676] transition-colors">Benefits</Link></li>
-                            <li><Link href="#" className="hover:text-[#00E676] transition-colors">Commission Structure</Link></li>
-                            <li><Link href="#" className="hover:text-[#00E676] transition-colors">Success Stories</Link></li>
+                            <li><Link href="/commissions" className="hover:text-[#00E676] transition-colors">Commission Structure</Link></li>
+                            <li><Link href="/success-stories" className="hover:text-[#00E676] transition-colors">Success Stories</Link></li>
                             <li><Link href="/login" className="hover:text-[#00E676] transition-colors">Partner Login</Link></li>
                         </ul>
                     </div>

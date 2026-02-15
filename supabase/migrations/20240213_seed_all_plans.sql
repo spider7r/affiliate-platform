@@ -20,10 +20,11 @@ begin
   end if;
 end $$;
 
--- 2. Seed Plans (STARTER, GROWTH, ENTERPRISE)
+-- 2. Seed Plans (FREE, STARTER, GROWTH, ENTERPRISE)
 -- Using ON CONFLICT to update if exists, or Insert if new.
 INSERT INTO public.plans (name, price, currency, interval)
 VALUES 
+  ('FREE', 0.00, 'USD', 'month'),
   ('STARTER', 29.00, 'USD', 'month'),
   ('GROWTH', 49.00, 'USD', 'month'),
   ('ENTERPRISE', 99.00, 'USD', 'month')
