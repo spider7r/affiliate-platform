@@ -31,7 +31,7 @@ export function Dashboard({ affiliate, referralCount, clickCount, recentReferral
     const [activePage, setActivePage] = useState<ActivePage>('overview')
     const [showEarnings, setShowEarnings] = useState(true)
     const [addingMethod, setAddingMethod] = useState<string | null>(null)
-    const referralLink = `https://thetradal.com?ref=AYUSHFX1`
+    const referralLink = `https://thetradal.com?ref=${affiliate.code}`
 
     // Chart data processing
     const days = 30

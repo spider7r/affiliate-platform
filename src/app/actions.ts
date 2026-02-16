@@ -5,59 +5,115 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 export async function registerAffiliate(formData: FormData) {
-    const supabase = await createClient()
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-    const fullName = formData.get('fullName') as string
+    try {
+        console.log('--- registerAffiliate ACTION STARTED ---') // Debug log
+        const supabase = await createClient()
+        const email = formData.get('email') as string
+        const password = formData.get('password') as string
+        const fullName = formData.get('fullName') as string
 
-    // Validate
-    if (!email || !password || !fullName) {
-        return { error: 'All fields are required' }
-    }
-    if (password.length < 6) {
-        return { error: 'Password must be at least 6 characters' }
-    }
+        console.log('Registration attempt for:', email)
 
-    const adminClient = createAdminClient()
+        // Validate
+        if (!email || !password || !fullName) {
+            console.log('Validation failed: missing fields')
+            return { error: 'All fields are required' }
+        }
+        if (password.length < 6) {
+            return { error: 'Password must be at least 6 characters' }
+        }
 
-    // Use Admin API to create user with auto-confirmation (bypasses email sending)
-    const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
-        user_metadata: { full_name: fullName }
-    })
-
-    if (authError) return { error: authError.message }
-
-    if (authData.user) {
-        // Generate a unique referral code
-        const code = fullName.split(' ')[0].toUpperCase().slice(0, 6) + Math.random().toString(36).substring(2, 6).toUpperCase()
-
-        const { error: insertError } = await adminClient.from('affiliates').insert({
-            user_id: authData.user.id,
-            full_name: fullName,
-            email: email,
-            code: code,
-            status: 'active',
-            commission_rate: 20
+        // Use regular SignUp to trigger Supabase Auth email confirmation
+        console.log('Calling supabase.auth.signUp...')
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: { full_name: fullName },
+                emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?next=/login`
+            }
         })
 
-        if (insertError) {
-            console.error('Affiliate insert error:', insertError)
-            return { error: 'Failed to create affiliate profile. Please contact support.' }
+        if (authError) {
+            console.error('Supabase Auth SignUp Error:', authError)
+            return { error: authError.message }
         }
 
-        // Auto-login the user after creation
-        const { error: loginError } = await supabase.auth.signInWithPassword({ email, password })
-        if (loginError) {
-            // Should not happen, but if it does, redirect to login
-            return { success: true, redirect: '/login' }
+        console.log('Auth successful. User ID:', authData.user?.id)
+
+        // If signup successful (even if unconfirmed), create affiliate profile
+        if (authData.user) {
+            // Generate a unique referral code
+            const code = fullName.split(' ')[0].toUpperCase().slice(0, 6) + Math.random().toString(36).substring(2, 6).toUpperCase()
+
+            const adminClient = createAdminClient()
+            console.log('Admin client created. Checking existing profile...')
+
+            // Check if profile exists by User ID OR Email to prevent duplicates
+            const { data: existingProfile } = await adminClient
+                .from('affiliates')
+                .select('id, user_id, email')
+                .or(`user_id.eq.${authData.user.id},email.eq.${email}`)
+                .maybeSingle()
+
+            if (existingProfile) {
+                console.log('Profile exists:', existingProfile.id)
+
+                // If the existing profile belongs to THIS user, it's a double-submit or re-login.
+                // Treat it as success (idempotent).
+                if (existingProfile.user_id === authData.user.id) {
+                    console.log('Profile matches current user. Returning success.')
+                    return { success: true, checkEmail: true, message: 'Please check your email to confirm your account.' }
+                }
+
+                // If profile exists with this email but different user_id, it's likely an orphaned profile (previous auth user deleted).
+                // We should link it to the new user.
+                console.log(`Orphaned profile found (Old User ID: ${existingProfile.user_id}). Linking to New User ID: ${authData.user.id}`)
+
+                const { error: updateError } = await adminClient
+                    .from('affiliates')
+                    .update({
+                        user_id: authData.user.id,
+                        full_name: fullName
+                    })
+                    .eq('id', existingProfile.id)
+
+                if (updateError) {
+                    console.error('Error linking orphaned profile:', updateError)
+                    return { error: 'Failed to link account. Please contact support.' }
+                }
+                // fall through to success return
+            } else {
+                console.log('Creating new affiliate profile...')
+                const { error: insertError } = await adminClient.from('affiliates').insert({
+                    user_id: authData.user.id,
+                    full_name: fullName,
+                    email: email,
+                    code: code,
+                    status: 'pending',
+                    commission_rate: 20
+                })
+
+                if (insertError) {
+                    console.error('Affiliate insert error FULL OBJECT:', JSON.stringify(insertError, null, 2))
+                    return { error: `Failed to create affiliate profile: ${insertError.message} (Code: ${insertError.code})` }
+                }
+                console.log('Affiliate profile created successfully.')
+            }
+
+            // Return success but indicate email verification is needed
+            return { success: true, checkEmail: true, message: 'Please check your email to confirm your account.' }
         }
+
+        return { error: 'Registration failed. User object missing from Auth response.' }
+    } catch (err: any) {
+        console.error('CRITICAL ERROR in registerAffiliate:', err)
+        // If it's a fetch error, it might be connectivity or Supabase down
+        if (err.message?.includes('fetch') || err.cause?.code === 'UND_ERR_CONNECT_TIMEOUT') {
+            return { error: 'Network Error: Could not connect to authentication server. Please check your internet or try again later.' }
+        }
+        return { error: `System Error: ${err.message || 'Unknown error'}` }
     }
-
-    revalidatePath('/')
-    return { success: true }
 }
 
 export async function loginAffiliate(formData: FormData) {

@@ -16,20 +16,35 @@ export function AuthCard({ initialView = 'login' }: AuthCardProps) {
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState(false)
 
+    const [message, setMessage] = useState<string | null>(null)
+    const [checkEmail, setCheckEmail] = useState(false)
+
     async function handleSubmit(formData: FormData) {
         setLoading(true)
         setError(null)
+        setMessage(null)
+        setCheckEmail(false)
 
         try {
             if (isRegister) {
                 const result = await registerAffiliate(formData)
-                if (result?.error) {
-                    setError(result.error)
-                } else if (result?.redirect) {
-                    window.location.href = result.redirect
+                // Type assertion since server actions return inferred types
+                const res = result as { error?: string, redirect?: string, message?: string, success?: boolean, checkEmail?: boolean }
+
+                if (res?.error) {
+                    setError(res.error)
+                } else if (res?.redirect) {
+                    window.location.href = res.redirect
+                } else if (res?.checkEmail) {
+                    setSuccess(true)
+                    setCheckEmail(true)
+                    setMessage(res.message || "Please check your email.")
+                } else if (res?.message) {
+                    setSuccess(true)
+                    setMessage(res.message)
                 } else {
                     setSuccess(true)
-                    // Wait a moment for the success animation then redirect
+                    // Auto-login success case (if we ever revert)
                     setTimeout(() => {
                         window.location.href = '/dashboard'
                     }, 2000)
@@ -84,17 +99,39 @@ export function AuthCard({ initialView = 'login' }: AuthCardProps) {
                             animate={{ opacity: 1, scale: 1 }}
                             className="text-center py-6 space-y-5"
                         >
-                            <div className="w-16 h-16 bg-[#00E676]/10 rounded-2xl flex items-center justify-center mx-auto border border-[#00E676]/20 shadow-lg shadow-[#00E676]/10">
-                                <CheckCircle2 className="w-8 h-8 text-[#00E676]" />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-bold">Registration Successful!</h3>
-                                <p className="text-[13px] text-white/30 mt-1.5 leading-relaxed">Account created successfully.<br />Logging you in...</p>
-                            </div>
-                            <div className="flex justify-center pt-2">
-                                <Loader2 className="w-5 h-5 animate-spin text-[#00E676]" />
-                            </div>
+                            {checkEmail ? (
+                                <>
+                                    <div className="w-20 h-20 bg-[#00E676]/10 rounded-full flex items-center justify-center mx-auto border border-[#00E676]/20 shadow-lg shadow-[#00E676]/10 animate-pulse">
+                                        <Mail className="w-10 h-10 text-[#00E676]" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold text-white">Verify your email</h3>
+                                        <p className="text-[14px] text-white/60 mt-2 leading-relaxed max-w-[280px] mx-auto">
+                                            We've sent a verification link to your email address. Please click the link to activate your account.
+                                        </p>
+                                    </div>
+                                    <div className="pt-4">
+                                        <div className="text-[12px] text-white/30 bg-white/5 py-2 px-4 rounded-lg inline-block">
+                                            Using Gmail? Check your "Promotions" tab.
+                                        </div>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="w-16 h-16 bg-[#00E676]/10 rounded-2xl flex items-center justify-center mx-auto border border-[#00E676]/20 shadow-lg shadow-[#00E676]/10">
+                                        <CheckCircle2 className="w-8 h-8 text-[#00E676]" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold">Registration Successful!</h3>
+                                        <p className="text-[13px] text-white/30 mt-1.5 leading-relaxed">{message || "Account created successfully. Logging you in..."}</p>
+                                    </div>
+                                    <div className="flex justify-center pt-2">
+                                        <Loader2 className="w-5 h-5 animate-spin text-[#00E676]" />
+                                    </div>
+                                </>
+                            )}
                         </motion.div>
+
                     ) : (
                         <motion.form
                             key={isRegister ? 'register' : 'login'}
@@ -171,18 +208,19 @@ export function AuthCard({ initialView = 'login' }: AuthCardProps) {
                                 )}
                             </button>
                         </motion.form>
-                    )}
-                </AnimatePresence>
-            </div>
+                    )
+                    }
+                </AnimatePresence >
+            </div >
 
             {/* Bottom info */}
-            <div className="text-center mt-6 space-y-2">
+            < div className="text-center mt-6 space-y-2" >
                 <p className="text-[11px] text-white/15">Earn <span className="text-[#00E676]/60 font-semibold">20% commission</span> on every referral</p>
                 <div className="flex items-center justify-center gap-1.5 text-[10px] text-white/10">
                     <Sparkles className="w-3 h-3" />
                     <span>Powered by Tradal</span>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     )
 }
