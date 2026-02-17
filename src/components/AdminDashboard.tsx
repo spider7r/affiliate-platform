@@ -324,7 +324,7 @@ export function AdminDashboard({ affiliates, allReferrals, allPayoutMethods, all
                                                                         <Wallet className="w-4 h-4 text-[#00E676]" />
                                                                         <p className="text-[10px] text-white/25 font-semibold uppercase tracking-wider">Payment Details</p>
                                                                     </div>
-                                                                
+
                                                                     {method ? (
                                                                         <div className="space-y-4">
                                                                             <div className="flex items-center gap-3">
@@ -336,7 +336,7 @@ export function AdminDashboard({ affiliates, allReferrals, allPayoutMethods, all
                                                                                     <p className="text-[10px] text-white/30">Primary Method</p>
                                                                                 </div>
                                                                             </div>
-                                                                
+
                                                                             <div className="grid grid-cols-2 gap-8 pt-4 border-t border-white/[0.06]">
                                                                                 {method.method_type === "bank_transfer" && (
                                                                                     <>
@@ -356,7 +356,7 @@ export function AdminDashboard({ affiliates, allReferrals, allPayoutMethods, all
                                                                                         </div>
                                                                                     </>
                                                                                 )}
-                                                                
+
                                                                                 {method.method_type === "crypto" && (
                                                                                     <>
                                                                                         <div><p className="text-[10px] text-white/25 uppercase font-semibold">Network</p><p className="text-[12px] font-bold text-[#00E676]">{method.crypto_network || "TRC20"}</p></div>
@@ -369,7 +369,7 @@ export function AdminDashboard({ affiliates, allReferrals, allPayoutMethods, all
                                                                                         </div>
                                                                                     </>
                                                                                 )}
-                                                                
+
                                                                                 {method.method_type === "paypal" && (
                                                                                     <div className="col-span-2">
                                                                                         <p className="text-[10px] text-white/25 uppercase font-semibold mb-1">PayPal Email</p>
@@ -441,215 +441,214 @@ export function AdminDashboard({ affiliates, allReferrals, allPayoutMethods, all
                                                                         )}
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        </motion.div>
+                                                            </motion.div>
                                                         </td></tr>)
-                                            }
+                                                        }
                                                     </Fragment>
-                                        )
+                                                )
                                             })}
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </motion.div>
                         )}
 
-                    {/* ═══ CONVERSIONS ═══ */}
-                    {activePage === 'conversions' && (
-                        <motion.div key="cv" {...fadeIn} className="space-y-5">
-                            <div className="grid grid-cols-4 gap-4">
-                                {[
-                                    { label: 'Total', value: allReferrals.length, icon: Activity, color: '#00E676' },
-                                    { label: 'Pending', value: allReferrals.filter(r => r.status === 'pending').length, icon: Clock, color: '#fbbf24' },
-                                    { label: 'Converted', value: allReferrals.filter(r => r.status === 'converted').length, icon: ArrowUpRight, color: '#3b82f6' },
-                                    { label: 'Paid', value: allReferrals.filter(r => r.status === 'paid').length, icon: Check, color: '#00E676' },
-                                ].map((s, i) => (
-                                    <div key={i} className="rounded-2xl border border-white/[0.06] bg-[#0A0A0A] p-5">
-                                        <div className="w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mb-3"><s.icon className="w-4 h-4" style={{ color: s.color }} /></div>
-                                        <h3 className="text-2xl font-bold">{s.value}</h3>
-                                        <p className="text-[10px] text-white/25 mt-0.5 font-medium">{s.label}</p>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0A] overflow-hidden">
-                                <table className="w-full text-sm">
-                                    <thead><tr className="text-white/25 text-[10px] uppercase tracking-[0.15em] font-semibold border-b border-white/[0.04]">
-                                        <th className="text-left px-6 py-3.5">Member</th><th className="text-left px-4 py-3.5">Email</th><th className="text-left px-4 py-3.5">Partner</th><th className="text-left px-4 py-3.5">Plan</th><th className="text-right px-4 py-3.5">Amount</th><th className="text-right px-4 py-3.5">Commission</th><th className="text-center px-4 py-3.5">Status</th><th className="text-right px-6 py-3.5">Date</th>
-                                    </tr></thead>
-                                    <tbody>
-                                        {allReferrals.map(r => {
-                                            const partner = affiliates.find((a: any) => a.id === r.affiliate_id)
-                                            return (
-                                                <tr key={r.id} className="border-t border-white/[0.04] hover:bg-white/[0.015]">
-                                                    <td className="px-6 py-3.5"><div className="flex items-center gap-2"><div className="w-7 h-7 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-[9px] font-bold text-white/30">{(r.referred_name || '?')[0].toUpperCase()}</div><span className="text-[12px] font-semibold">{r.referred_name}</span></div></td>
-                                                    <td className="px-4 py-3.5 text-[11px] text-white/25">{r.referred_email}</td>
-                                                    <td className="px-4 py-3.5"><span className="text-[11px] text-[#00E676] font-semibold">{partner?.full_name || '—'}</span></td>
-                                                    <td className="px-4 py-3.5 text-[11px]">{r.plan_purchased}</td>
-                                                    <td className="px-4 py-3.5 text-right text-[11px]">${r.amount?.toFixed(2)}</td>
-                                                    <td className="px-4 py-3.5 text-right text-[12px] font-bold text-[#00E676]">+${r.earnings.toFixed(2)}</td>
-                                                    <td className="px-4 py-3.5 text-center">{badge(r.status)}</td>
-                                                    <td className="px-6 py-3.5 text-right text-[11px] text-white/25">{new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
-                                                </tr>
-                                            )
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </motion.div>
-                    )}
+                        {/* ═══ CONVERSIONS ═══ */}
+                        {activePage === 'conversions' && (
+                            <motion.div key="cv" {...fadeIn} className="space-y-5">
+                                <div className="grid grid-cols-4 gap-4">
+                                    {[
+                                        { label: 'Total', value: allReferrals.length, icon: Activity, color: '#00E676' },
+                                        { label: 'Pending', value: allReferrals.filter(r => r.status === 'pending').length, icon: Clock, color: '#fbbf24' },
+                                        { label: 'Converted', value: allReferrals.filter(r => r.status === 'converted').length, icon: ArrowUpRight, color: '#3b82f6' },
+                                        { label: 'Paid', value: allReferrals.filter(r => r.status === 'paid').length, icon: Check, color: '#00E676' },
+                                    ].map((s, i) => (
+                                        <div key={i} className="rounded-2xl border border-white/[0.06] bg-[#0A0A0A] p-5">
+                                            <div className="w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mb-3"><s.icon className="w-4 h-4" style={{ color: s.color }} /></div>
+                                            <h3 className="text-2xl font-bold">{s.value}</h3>
+                                            <p className="text-[10px] text-white/25 mt-0.5 font-medium">{s.label}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0A] overflow-hidden">
+                                    <table className="w-full text-sm">
+                                        <thead><tr className="text-white/25 text-[10px] uppercase tracking-[0.15em] font-semibold border-b border-white/[0.04]">
+                                            <th className="text-left px-6 py-3.5">Member</th><th className="text-left px-4 py-3.5">Email</th><th className="text-left px-4 py-3.5">Partner</th><th className="text-left px-4 py-3.5">Plan</th><th className="text-right px-4 py-3.5">Amount</th><th className="text-right px-4 py-3.5">Commission</th><th className="text-center px-4 py-3.5">Status</th><th className="text-right px-6 py-3.5">Date</th>
+                                        </tr></thead>
+                                        <tbody>
+                                            {allReferrals.map(r => {
+                                                const partner = affiliates.find((a: any) => a.id === r.affiliate_id)
+                                                return (
+                                                    <tr key={r.id} className="border-t border-white/[0.04] hover:bg-white/[0.015]">
+                                                        <td className="px-6 py-3.5"><div className="flex items-center gap-2"><div className="w-7 h-7 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-[9px] font-bold text-white/30">{(r.referred_name || '?')[0].toUpperCase()}</div><span className="text-[12px] font-semibold">{r.referred_name}</span></div></td>
+                                                        <td className="px-4 py-3.5 text-[11px] text-white/25">{r.referred_email}</td>
+                                                        <td className="px-4 py-3.5"><span className="text-[11px] text-[#00E676] font-semibold">{partner?.full_name || '—'}</span></td>
+                                                        <td className="px-4 py-3.5 text-[11px]">{r.plan_purchased}</td>
+                                                        <td className="px-4 py-3.5 text-right text-[11px]">${r.amount?.toFixed(2)}</td>
+                                                        <td className="px-4 py-3.5 text-right text-[12px] font-bold text-[#00E676]">+${r.earnings.toFixed(2)}</td>
+                                                        <td className="px-4 py-3.5 text-center">{badge(r.status)}</td>
+                                                        <td className="px-6 py-3.5 text-right text-[11px] text-white/25">{new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
+                                                    </tr>
+                                                )
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </motion.div>
+                        )}
 
-                    {/* ═══ PAYOUTS ═══ */}
-                    {activePage === 'payouts' && (
-                        <motion.div key="py" {...fadeIn} className="space-y-5">
-                            <div className="grid grid-cols-3 gap-5">
-                                {[
-                                    { label: 'Total Paid Out', value: `$${stats.totalPaid.toFixed(2)}`, icon: Send, color: '#00E676', glow: true },
-                                    { label: 'Pending Payouts', value: `$${stats.totalPending.toFixed(2)}`, icon: Clock, color: '#f97316' },
-                                    { label: 'Total Transactions', value: allPayouts.length, icon: Activity, color: '#a78bfa' },
-                                ].map((s, i) => (
-                                    <div key={i} className="rounded-2xl border border-white/[0.06] bg-[#0A0A0A] p-6 relative overflow-hidden">
-                                        {s.glow && <div className="absolute top-0 right-0 w-40 h-40 bg-[#00E676]/[0.04] rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />}
-                                        <div className="relative"><div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mb-3"><s.icon className="w-5 h-5" style={{ color: s.color }} /></div><h3 className="text-2xl font-bold" style={{ color: s.color }}>{s.value}</h3><p className="text-[10px] text-white/25 mt-0.5 font-medium">{s.label}</p></div>
-                                    </div>
-                                ))}
-                            </div>
+                        {/* ═══ PAYOUTS ═══ */}
+                        {activePage === 'payouts' && (
+                            <motion.div key="py" {...fadeIn} className="space-y-5">
+                                <div className="grid grid-cols-3 gap-5">
+                                    {[
+                                        { label: 'Total Paid Out', value: `$${stats.totalPaid.toFixed(2)}`, icon: Send, color: '#00E676', glow: true },
+                                        { label: 'Pending Payouts', value: `$${stats.totalPending.toFixed(2)}`, icon: Clock, color: '#f97316' },
+                                        { label: 'Total Transactions', value: allPayouts.length, icon: Activity, color: '#a78bfa' },
+                                    ].map((s, i) => (
+                                        <div key={i} className="rounded-2xl border border-white/[0.06] bg-[#0A0A0A] p-6 relative overflow-hidden">
+                                            {s.glow && <div className="absolute top-0 right-0 w-40 h-40 bg-[#00E676]/[0.04] rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />}
+                                            <div className="relative"><div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mb-3"><s.icon className="w-5 h-5" style={{ color: s.color }} /></div><h3 className="text-2xl font-bold" style={{ color: s.color }}>{s.value}</h3><p className="text-[10px] text-white/25 mt-0.5 font-medium">{s.label}</p></div>
+                                        </div>
+                                    ))}
+                                </div>
 
-                            {/* Pending per partner */}
-                            {affiliates.filter(a => (a.pending_payout || 0) > 0).length > 0 && (
-                                <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0A] p-6">
-                                    <h3 className="text-[14px] font-bold mb-5 flex items-center gap-2"><AlertCircle className="w-4 h-4 text-orange-400" /> Pending Payouts</h3>
-                                    <div className="space-y-3">
-                                        {affiliates.filter(a => (a.pending_payout || 0) > 0).map(aff => {
-                                            const method = getMethod(aff.id)
-                                            return (
-                                                <div key={aff.id} className="flex items-center justify-between bg-black/30 border border-white/[0.06] rounded-2xl p-5">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#00E676] to-emerald-600 flex items-center justify-center text-[11px] font-bold text-black">{(aff.full_name || '?')[0].toUpperCase()}</div>
-                                                        <div><p className="text-[12px] font-semibold">{aff.full_name}</p><p className="text-[10px] text-white/20">{aff.email}</p></div>
+                                {/* Pending per partner */}
+                                {affiliates.filter(a => (a.pending_payout || 0) > 0).length > 0 && (
+                                    <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0A] p-6">
+                                        <h3 className="text-[14px] font-bold mb-5 flex items-center gap-2"><AlertCircle className="w-4 h-4 text-orange-400" /> Pending Payouts</h3>
+                                        <div className="space-y-3">
+                                            {affiliates.filter(a => (a.pending_payout || 0) > 0).map(aff => {
+                                                const method = getMethod(aff.id)
+                                                return (
+                                                    <div key={aff.id} className="flex items-center justify-between bg-black/30 border border-white/[0.06] rounded-2xl p-5">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#00E676] to-emerald-600 flex items-center justify-center text-[11px] font-bold text-black">{(aff.full_name || '?')[0].toUpperCase()}</div>
+                                                            <div><p className="text-[12px] font-semibold">{aff.full_name}</p><p className="text-[10px] text-white/20">{aff.email}</p></div>
+                                                        </div>
+                                                        <div className="flex items-center gap-4">
+                                                            {method ? <div className="flex items-center gap-1.5 text-[10px] text-white/25">{methodIcon(method.method_type)} {methodLabel(method.method_type)}</div> : <span className="text-[10px] text-red-400/60">No method</span>}
+                                                            <span className="text-[14px] font-black text-orange-400">${(aff.pending_payout || 0).toFixed(2)}</span>
+                                                            {method && <button onClick={async () => await processPayoutAction(aff.id, aff.pending_payout, method.method_type)} className="bg-[#00E676]/10 text-[#00E676] border border-[#00E676]/20 hover:bg-[#00E676]/20 rounded-xl px-5 py-2.5 text-[12px] font-bold transition-all flex items-center gap-2 hover:shadow-lg hover:shadow-[#00E676]/10"><Send className="w-3.5 h-3.5" /> Process</button>}
+                                                        </div>
                                                     </div>
-                                                    <div className="flex items-center gap-4">
-                                                        {method ? <div className="flex items-center gap-1.5 text-[10px] text-white/25">{methodIcon(method.method_type)} {methodLabel(method.method_type)}</div> : <span className="text-[10px] text-red-400/60">No method</span>}
-                                                        <span className="text-[14px] font-black text-orange-400">${(aff.pending_payout || 0).toFixed(2)}</span>
-                                                        {method && <button onClick={async () => await processPayoutAction(aff.id, aff.pending_payout, method.method_type)} className="bg-[#00E676]/10 text-[#00E676] border border-[#00E676]/20 hover:bg-[#00E676]/20 rounded-xl px-5 py-2.5 text-[12px] font-bold transition-all flex items-center gap-2 hover:shadow-lg hover:shadow-[#00E676]/10"><Send className="w-3.5 h-3.5" /> Process</button>}
+                                                )
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0A] overflow-hidden">
+                                    <div className="p-6 border-b border-white/[0.04]"><h3 className="text-[14px] font-bold">All Payout History</h3></div>
+                                    <table className="w-full text-sm">
+                                        <thead><tr className="text-white/25 text-[10px] uppercase tracking-[0.15em] font-semibold border-b border-white/[0.04]">
+                                            <th className="text-left px-6 py-3">Partner</th><th className="text-left px-4 py-3">Method</th><th className="text-right px-4 py-3">Amount</th><th className="text-center px-4 py-3">Status</th><th className="text-right px-6 py-3">Date</th>
+                                        </tr></thead>
+                                        <tbody>
+                                            {allPayouts.map(p => {
+                                                const partner = affiliates.find((a: any) => a.id === p.affiliate_id)
+                                                return (
+                                                    <tr key={p.id} className="border-t border-white/[0.04] hover:bg-white/[0.015]">
+                                                        <td className="px-6 py-3.5"><div className="flex items-center gap-2"><div className="w-7 h-7 rounded-xl bg-gradient-to-br from-[#00E676] to-emerald-600 flex items-center justify-center text-[9px] font-bold text-black">{(partner?.full_name || '?')[0].toUpperCase()}</div><span className="text-[12px] font-semibold">{partner?.full_name}</span></div></td>
+                                                        <td className="px-4 py-3.5"><div className="flex items-center gap-1.5 text-[11px]">{methodIcon(p.method_type)} {methodLabel(p.method_type)}</div></td>
+                                                        <td className="px-4 py-3.5 text-right text-[12px] font-bold">${p.amount.toFixed(2)}</td>
+                                                        <td className="px-4 py-3.5 text-center">{badge(p.status)}</td>
+                                                        <td className="px-6 py-3.5 text-right text-[11px] text-white/25">{new Date(p.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                                                    </tr>
+                                                )
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {/* ═══ ANALYTICS ═══ */}
+                        {activePage === 'analytics' && (
+                            <motion.div key="an" {...fadeIn} className="space-y-6">
+                                <div className="grid grid-cols-2 gap-5">
+                                    {/* Plan Breakdown */}
+                                    <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0A] p-6">
+                                        <h3 className="text-[14px] font-bold mb-1">Plan Breakdown</h3>
+                                        <p className="text-[11px] text-white/20 mb-5">Conversions by subscription tier</p>
+                                        <div className="space-y-4">
+                                            {Object.entries(planStats).sort(([, a], [, b]) => (b as number) - (a as number)).map(([plan, count]) => {
+                                                const pct = allReferrals.length > 0 ? ((count as number) / allReferrals.length * 100) : 0
+                                                return (
+                                                    <div key={plan}>
+                                                        <div className="flex justify-between text-[12px] mb-2"><span className="font-semibold">{plan}</span><span className="text-white/30">{count as number} ({pct.toFixed(0)}%)</span></div>
+                                                        <div className="w-full bg-white/[0.04] rounded-full h-2.5 overflow-hidden"><motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ delay: 0.3 }} className="bg-gradient-to-r from-[#00E676]/40 to-[#00E676] rounded-full h-2.5" /></div>
                                                     </div>
-                                                </div>
-                                            )
-                                        })}
+                                                )
+                                            })}
+                                        </div>
+                                    </div>
+                                    {/* Partner Status */}
+                                    <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0A] p-6">
+                                        <h3 className="text-[14px] font-bold mb-1">Partner Status</h3>
+                                        <p className="text-[11px] text-white/20 mb-5">Breakdown by account status</p>
+                                        <div className="space-y-4">
+                                            {[
+                                                { label: 'Active', count: affiliates.filter(a => a.status === 'active').length, color: '#00E676' },
+                                                { label: 'Pending', count: affiliates.filter(a => a.status === 'pending').length, color: '#fbbf24' },
+                                                { label: 'Suspended', count: affiliates.filter(a => a.status === 'suspended').length, color: '#f87171' },
+                                            ].map(item => {
+                                                const pct = affiliates.length > 0 ? (item.count / affiliates.length * 100) : 0
+                                                return (
+                                                    <div key={item.label}>
+                                                        <div className="flex justify-between text-[12px] mb-2"><span className="font-semibold" style={{ color: item.color }}>{item.label}</span><span className="text-white/30">{item.count} ({pct.toFixed(0)}%)</span></div>
+                                                        <div className="w-full bg-white/[0.04] rounded-full h-2.5 overflow-hidden"><motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ delay: 0.3 }} className="rounded-full h-2.5" style={{ backgroundColor: item.color }} /></div>
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
                                     </div>
                                 </div>
-                            )}
 
-                            <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0A] overflow-hidden">
-                                <div className="p-6 border-b border-white/[0.04]"><h3 className="text-[14px] font-bold">All Payout History</h3></div>
-                                <table className="w-full text-sm">
-                                    <thead><tr className="text-white/25 text-[10px] uppercase tracking-[0.15em] font-semibold border-b border-white/[0.04]">
-                                        <th className="text-left px-6 py-3">Partner</th><th className="text-left px-4 py-3">Method</th><th className="text-right px-4 py-3">Amount</th><th className="text-center px-4 py-3">Status</th><th className="text-right px-6 py-3">Date</th>
-                                    </tr></thead>
-                                    <tbody>
-                                        {allPayouts.map(p => {
-                                            const partner = affiliates.find((a: any) => a.id === p.affiliate_id)
-                                            return (
-                                                <tr key={p.id} className="border-t border-white/[0.04] hover:bg-white/[0.015]">
-                                                    <td className="px-6 py-3.5"><div className="flex items-center gap-2"><div className="w-7 h-7 rounded-xl bg-gradient-to-br from-[#00E676] to-emerald-600 flex items-center justify-center text-[9px] font-bold text-black">{(partner?.full_name || '?')[0].toUpperCase()}</div><span className="text-[12px] font-semibold">{partner?.full_name}</span></div></td>
-                                                    <td className="px-4 py-3.5"><div className="flex items-center gap-1.5 text-[11px]">{methodIcon(p.method_type)} {methodLabel(p.method_type)}</div></td>
-                                                    <td className="px-4 py-3.5 text-right text-[12px] font-bold">${p.amount.toFixed(2)}</td>
-                                                    <td className="px-4 py-3.5 text-center">{badge(p.status)}</td>
-                                                    <td className="px-6 py-3.5 text-right text-[11px] text-white/25">{new Date(p.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-                                                </tr>
-                                            )
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </motion.div>
-                    )}
+                                {/* KPIs */}
+                                <div className="grid grid-cols-4 gap-4">
+                                    {[
+                                        { label: 'Revenue/Partner', value: `$${affiliates.length ? (totalRevenueGenerated / affiliates.length).toFixed(2) : '0'}` },
+                                        { label: 'Commission/Conv.', value: `$${allReferrals.length ? (stats.totalEarnings / allReferrals.length).toFixed(2) : '0'}` },
+                                        { label: 'Payout Ratio', value: `${stats.totalEarnings > 0 ? ((stats.totalPaid / stats.totalEarnings) * 100).toFixed(0) : 0}%` },
+                                        { label: 'Active Rate', value: `${stats.totalPartners > 0 ? ((stats.activePartners / stats.totalPartners) * 100).toFixed(0) : 0}%` },
+                                    ].map((k, i) => (
+                                        <div key={i} className="rounded-2xl border border-white/[0.06] bg-[#0A0A0A] p-5 text-center">
+                                            <h3 className="text-2xl font-black text-[#00E676]">{k.value}</h3>
+                                            <p className="text-[10px] text-white/25 mt-1 font-medium">{k.label}</p>
+                                        </div>
+                                    ))}
+                                </div>
 
-                    {/* ═══ ANALYTICS ═══ */}
-                    {activePage === 'analytics' && (
-                        <motion.div key="an" {...fadeIn} className="space-y-6">
-                            <div className="grid grid-cols-2 gap-5">
-                                {/* Plan Breakdown */}
+                                {/* All Partners table (analytics view) */}
                                 <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0A] p-6">
-                                    <h3 className="text-[14px] font-bold mb-1">Plan Breakdown</h3>
-                                    <p className="text-[11px] text-white/20 mb-5">Conversions by subscription tier</p>
-                                    <div className="space-y-4">
-                                        {Object.entries(planStats).sort(([, a], [, b]) => (b as number) - (a as number)).map(([plan, count]) => {
-                                            const pct = allReferrals.length > 0 ? ((count as number) / allReferrals.length * 100) : 0
-                                            return (
-                                                <div key={plan}>
-                                                    <div className="flex justify-between text-[12px] mb-2"><span className="font-semibold">{plan}</span><span className="text-white/30">{count as number} ({pct.toFixed(0)}%)</span></div>
-                                                    <div className="w-full bg-white/[0.04] rounded-full h-2.5 overflow-hidden"><motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ delay: 0.3 }} className="bg-gradient-to-r from-[#00E676]/40 to-[#00E676] rounded-full h-2.5" /></div>
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
+                                    <h3 className="text-[14px] font-bold mb-5">Partner Performance</h3>
+                                    <table className="w-full text-sm">
+                                        <thead><tr className="text-white/25 text-[10px] uppercase tracking-[0.15em] font-semibold border-b border-white/[0.04]">
+                                            <th className="text-left px-4 py-3">Partner</th><th className="text-center px-4 py-3">Conv.</th><th className="text-right px-4 py-3">Earnings</th><th className="text-center px-4 py-3">Rate</th><th className="text-right px-4 py-3">Avg/Conv</th><th className="text-center px-4 py-3">Status</th>
+                                        </tr></thead>
+                                        <tbody>
+                                            {[...affiliates].sort((a, b) => b.total_earnings - a.total_earnings).map(a => {
+                                                const rc = getRefs(a.id).length
+                                                return (
+                                                    <tr key={a.id} className="border-t border-white/[0.04]">
+                                                        <td className="px-4 py-3"><div className="flex items-center gap-2"><div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#00E676] to-emerald-600 flex items-center justify-center text-[9px] font-bold text-black">{(a.full_name || '?')[0].toUpperCase()}</div><span className="text-[12px] font-semibold">{a.full_name}</span></div></td>
+                                                        <td className="px-4 py-3 text-center text-[12px] font-bold">{rc}</td>
+                                                        <td className="px-4 py-3 text-right text-[12px] font-bold text-[#00E676]">${a.total_earnings.toFixed(2)}</td>
+                                                        <td className="px-4 py-3 text-center text-[11px]">{a.commission_rate}%</td>
+                                                        <td className="px-4 py-3 text-right text-[11px] text-white/30">${rc > 0 ? (a.total_earnings / rc).toFixed(2) : '0.00'}</td>
+                                                        <td className="px-4 py-3 text-center">{badge(a.status)}</td>
+                                                    </tr>
+                                                )
+                                            })}
+                                        </tbody>
+                                    </table>
                                 </div>
-                                {/* Partner Status */}
-                                <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0A] p-6">
-                                    <h3 className="text-[14px] font-bold mb-1">Partner Status</h3>
-                                    <p className="text-[11px] text-white/20 mb-5">Breakdown by account status</p>
-                                    <div className="space-y-4">
-                                        {[
-                                            { label: 'Active', count: affiliates.filter(a => a.status === 'active').length, color: '#00E676' },
-                                            { label: 'Pending', count: affiliates.filter(a => a.status === 'pending').length, color: '#fbbf24' },
-                                            { label: 'Suspended', count: affiliates.filter(a => a.status === 'suspended').length, color: '#f87171' },
-                                        ].map(item => {
-                                            const pct = affiliates.length > 0 ? (item.count / affiliates.length * 100) : 0
-                                            return (
-                                                <div key={item.label}>
-                                                    <div className="flex justify-between text-[12px] mb-2"><span className="font-semibold" style={{ color: item.color }}>{item.label}</span><span className="text-white/30">{item.count} ({pct.toFixed(0)}%)</span></div>
-                                                    <div className="w-full bg-white/[0.04] rounded-full h-2.5 overflow-hidden"><motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ delay: 0.3 }} className="rounded-full h-2.5" style={{ backgroundColor: item.color }} /></div>
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
-                                </div>
-                            </div>
+                            </motion.div>
+                        )}
 
-                            {/* KPIs */}
-                            <div className="grid grid-cols-4 gap-4">
-                                {[
-                                    { label: 'Revenue/Partner', value: `$${affiliates.length ? (totalRevenueGenerated / affiliates.length).toFixed(2) : '0'}` },
-                                    { label: 'Commission/Conv.', value: `$${allReferrals.length ? (stats.totalEarnings / allReferrals.length).toFixed(2) : '0'}` },
-                                    { label: 'Payout Ratio', value: `${stats.totalEarnings > 0 ? ((stats.totalPaid / stats.totalEarnings) * 100).toFixed(0) : 0}%` },
-                                    { label: 'Active Rate', value: `${stats.totalPartners > 0 ? ((stats.activePartners / stats.totalPartners) * 100).toFixed(0) : 0}%` },
-                                ].map((k, i) => (
-                                    <div key={i} className="rounded-2xl border border-white/[0.06] bg-[#0A0A0A] p-5 text-center">
-                                        <h3 className="text-2xl font-black text-[#00E676]">{k.value}</h3>
-                                        <p className="text-[10px] text-white/25 mt-1 font-medium">{k.label}</p>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* All Partners table (analytics view) */}
-                            <div className="rounded-2xl border border-white/[0.06] bg-[#0A0A0A] p-6">
-                                <h3 className="text-[14px] font-bold mb-5">Partner Performance</h3>
-                                <table className="w-full text-sm">
-                                    <thead><tr className="text-white/25 text-[10px] uppercase tracking-[0.15em] font-semibold border-b border-white/[0.04]">
-                                        <th className="text-left px-4 py-3">Partner</th><th className="text-center px-4 py-3">Conv.</th><th className="text-right px-4 py-3">Earnings</th><th className="text-center px-4 py-3">Rate</th><th className="text-right px-4 py-3">Avg/Conv</th><th className="text-center px-4 py-3">Status</th>
-                                    </tr></thead>
-                                    <tbody>
-                                        {[...affiliates].sort((a, b) => b.total_earnings - a.total_earnings).map(a => {
-                                            const rc = getRefs(a.id).length
-                                            return (
-                                                <tr key={a.id} className="border-t border-white/[0.04]">
-                                                    <td className="px-4 py-3"><div className="flex items-center gap-2"><div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#00E676] to-emerald-600 flex items-center justify-center text-[9px] font-bold text-black">{(a.full_name || '?')[0].toUpperCase()}</div><span className="text-[12px] font-semibold">{a.full_name}</span></div></td>
-                                                    <td className="px-4 py-3 text-center text-[12px] font-bold">{rc}</td>
-                                                    <td className="px-4 py-3 text-right text-[12px] font-bold text-[#00E676]">${a.total_earnings.toFixed(2)}</td>
-                                                    <td className="px-4 py-3 text-center text-[11px]">{a.commission_rate}%</td>
-                                                    <td className="px-4 py-3 text-right text-[11px] text-white/30">${rc > 0 ? (a.total_earnings / rc).toFixed(2) : '0.00'}</td>
-                                                    <td className="px-4 py-3 text-center">{badge(a.status)}</td>
-                                                </tr>
-                                            )
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </motion.div>
-                    )}
-
-                </AnimatePresence>
-        </div>
+                    </AnimatePresence>
+                </div>
             </main >
         </div >
     )
