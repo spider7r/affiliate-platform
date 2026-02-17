@@ -423,6 +423,7 @@ export function AdminDashboard({ affiliates, allReferrals, allPayoutMethods, all
                                                                             )}
                                                                         </div>
                                                                     </div>
+                                                                </div>
                                                             </motion.div>
                                                         </td></tr>)}
                                                     </Fragment>
