@@ -304,68 +304,125 @@ export function AdminDashboard({ affiliates, allReferrals, allPayoutMethods, all
                                                                         { label: 'Email', value: aff.email, icon: Mail },
                                                                         { label: 'Joined', value: new Date(aff.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), icon: Calendar },
                                                                         { label: 'Referral Link', value: `thetradal.com?ref=${aff.code}`, icon: Globe, mono: true, green: true },
-                                                                        { label: 'Payout Method', value: method ? methodLabel(method.method_type) : 'Not set', icon: Wallet, warn: !method },
                                                                     ].map(c => (
                                                                         <div key={c.label} className="bg-black/30 border border-white/[0.06] rounded-2xl p-5">
                                                                             <c.icon className="w-4 h-4 text-[#00E676] mb-3" />
                                                                             <p className="text-[10px] text-white/25 mb-1 font-semibold uppercase tracking-wider">{c.label}</p>
-                                                                            <p className={`text-[12px] font-medium truncate ${(c as any).mono ? 'font-mono' : ''} ${(c as any).green ? 'text-[#00E676]' : ''} ${(c as any).warn ? 'text-red-400/60' : ''}`}>{c.value}</p>
+                                                                            <div className="flex items-center gap-2 group/copy">
+                                                                                <p className={`text-[12px] font-medium truncate ${(c as any).mono ? 'font-mono' : ''} ${(c as any).green ? 'text-[#00E676]' : ''}`}>{c.value}</p>
+                                                                                <button onClick={() => navigator.clipboard.writeText(c.value)} className="opacity-0 group-hover/copy:opacity-100 transition-opacity p-1 hover:bg-white/[0.1] rounded"><span className="text-[9px] text-white/40">Copy</span></button>
+                                                                            </div>
                                                                         </div>
                                                                     ))}
-                                                                </div>
-                                                                <div className="grid grid-cols-2 gap-5">
-                                                                    {/* Converted Members */}
-                                                                    <div className="bg-black/30 border border-white/[0.06] rounded-2xl p-6">
-                                                                        <h4 className="text-[13px] font-bold mb-4 flex items-center gap-2"><UserCheck className="w-4 h-4 text-[#00E676]" /> Converted Members ({refs.length})</h4>
-                                                                        {refs.length === 0 ? <p className="text-[11px] text-white/20">No conversions yet</p> : (
-                                                                            <div className="space-y-2.5 max-h-60 overflow-y-auto">
-                                                                                {refs.map((r: any) => (
-                                                                                    <div key={r.id} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.01] border border-white/[0.04]">
-                                                                                        <div className="flex items-center gap-3">
-                                                                                            <div className="w-7 h-7 rounded-lg bg-white/[0.04] flex items-center justify-center text-[9px] font-bold text-white/30">{(r.referred_name || '?')[0].toUpperCase()}</div>
-                                                                                            <div>
-                                                                                                <p className="text-[11px] font-semibold">{r.referred_name || 'Anonymous'}</p>
-                                                                                                <p className="text-[9px] text-white/20">{r.referred_email} • {r.plan_purchased}</p>
+
+                                                                    {/* Payment Details Card */}
+                                                                    <div className="bg-black/30 border border-white/[0.06] rounded-2xl p-5 relative overflow-hidden group/pay">
+                                                                        <div className="absolute top-0 right-0 w-20 h-20 bg-[#00E676]/[0.03] rounded-full blur-[40px] -translate-y-1/2 translate-x-1/2" />
+                                                                        <Wallet className="w-4 h-4 text-[#00E676] mb-3" />
+                                                                        <p className="text-[10px] text-white/25 mb-2 font-semibold uppercase tracking-wider">Payment Details</p>
+
+                                                                        {method ? (
+                                                                            <div className="space-y-2">
+                                                                                <div className="flex items-center gap-2 mb-2">
+                                                                                    {methodIcon(method.method_type)}
+                                                                                    <span className="text-[12px] font-bold text-white">{methodLabel(method.method_type)}</span>
+                                                                                </div>
+
+                                                                                {/* Conditional Details based on Method Type */}
+                                                                                {method.method_type === 'bank_transfer' && (
+                                                                                    <div className="space-y-1 text-[11px] text-white/60">
+                                                                                        <p><span className="text-white/30">Bank:</span> {method.bank_name}</p>
+                                                                                        <p><span className="text-white/30">Account:</span> {method.account_name}</p>
+                                                                                        <div className="flex items-center gap-2 group/iban">
+                                                                                            <span className="text-white/30">IBAN:</span> <span className="font-mono text-white/80">{method.account_number}</span>
+                                                                                            <button onClick={() => navigator.clipboard.writeText(method.account_number)} className="opacity-0 group-hover/iban:opacity-100 p-0.5 hover:text-[#00E676]"><span className="text-[9px]">Copy</span></button>
+                                                                                        </div>
+                                                                                        <p><span className="text-white/30">Swift:</span> {method.swift_code}</p>
+                                                                                    </div>
+                                                                                )}
+
+                                                                                {method.method_type === 'crypto' && (
+                                                                                    <div className="space-y-1 text-[11px] text-white/60">
+                                                                                        <p><span className="text-white/30">Network:</span> <span className="text-[#00E676] bg-[#00E676]/10 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold">{method.crypto_network || 'TRC20'}</span></p>
+                                                                                        <div className="group/wallet">
+                                                                                            <span className="text-white/30 block mb-0.5">Wallet Address:</span>
+                                                                                            <div className="flex items-center gap-2 bg-black/40 p-2 rounded-lg border border-white/[0.06]">
+                                                                                                <code className="text-[10px] font-mono text-white/80 break-all">{method.crypto_wallet_address}</code>
+                                                                                                <button onClick={() => navigator.clipboard.writeText(method.crypto_wallet_address)} className="text-[10px] text-[#00E676] hover:underline whitespace-nowrap ml-auto">Copy</button>
                                                                                             </div>
                                                                                         </div>
-                                                                                        <div className="text-right flex items-center gap-3">
-                                                                                            <span className="text-[11px] text-[#00E676] font-bold">+${r.earnings.toFixed(2)}</span>
-                                                                                            {badge(r.status)}
+                                                                                    </div>
+                                                                                )}
+
+                                                                                {method.method_type === 'paypal' && (
+                                                                                    <div className="space-y-1 text-[11px] text-white/60">
+                                                                                        <div className="group/pp">
+                                                                                            <span className="text-white/30">Email:</span> <span className="text-white/80">{method.paypal_email}</span>
+                                                                                            <button onClick={() => navigator.clipboard.writeText(method.paypal_email)} className="ml-2 opacity-0 group-hover/pp:opacity-100 text-[10px] text-[#00E676] hover:underline">Copy</button>
                                                                                         </div>
+                                                                                    </div>
+                                                                                )}
+                                                                            </div>
+                                                                        ) : (
+                                                                            <div className="flex flex-col items-center justify-center h-20 text-center">
+                                                                                <AlertCircle className="w-5 h-5 text-red-400/50 mb-1" />
+                                                                                <p className="text-[11px] text-red-400/50">No payment method set</p>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                    <div className="grid grid-cols-2 gap-5">
+                                                                        {/* Converted Members */}
+                                                                        <div className="bg-black/30 border border-white/[0.06] rounded-2xl p-6">
+                                                                            <h4 className="text-[13px] font-bold mb-4 flex items-center gap-2"><UserCheck className="w-4 h-4 text-[#00E676]" /> Converted Members ({refs.length})</h4>
+                                                                            {refs.length === 0 ? <p className="text-[11px] text-white/20">No conversions yet</p> : (
+                                                                                <div className="space-y-2.5 max-h-60 overflow-y-auto">
+                                                                                    {refs.map((r: any) => (
+                                                                                        <div key={r.id} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.01] border border-white/[0.04]">
+                                                                                            <div className="flex items-center gap-3">
+                                                                                                <div className="w-7 h-7 rounded-lg bg-white/[0.04] flex items-center justify-center text-[9px] font-bold text-white/30">{(r.referred_name || '?')[0].toUpperCase()}</div>
+                                                                                                <div>
+                                                                                                    <p className="text-[11px] font-semibold">{r.referred_name || 'Anonymous'}</p>
+                                                                                                    <p className="text-[9px] text-white/20">{r.referred_email} • {r.plan_purchased}</p>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div className="text-right flex items-center gap-3">
+                                                                                                <span className="text-[11px] text-[#00E676] font-bold">+${r.earnings.toFixed(2)}</span>
+                                                                                                {badge(r.status)}
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    ))}
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                        {/* Financial */}
+                                                                        <div className="bg-black/30 border border-white/[0.06] rounded-2xl p-6">
+                                                                            <h4 className="text-[13px] font-bold mb-4 flex items-center gap-2"><DollarSign className="w-4 h-4 text-[#00E676]" /> Financial Summary</h4>
+                                                                            <div className="space-y-3">
+                                                                                {[
+                                                                                    { l: 'Total Earned', v: `$${(aff.total_earnings || 0).toFixed(2)}`, c: 'text-white' },
+                                                                                    { l: 'Already Paid', v: `$${(aff.total_paid || 0).toFixed(2)}`, c: 'text-[#00E676]' },
+                                                                                    { l: 'Pending Payout', v: `$${(aff.pending_payout || 0).toFixed(2)}`, c: 'text-orange-400' },
+                                                                                ].map(item => (
+                                                                                    <div key={item.l} className="flex justify-between text-[12px] p-3 rounded-xl bg-white/[0.01]">
+                                                                                        <span className="text-white/30">{item.l}</span>
+                                                                                        <span className={`font-bold ${item.c}`}>{item.v}</span>
                                                                                     </div>
                                                                                 ))}
                                                                             </div>
-                                                                        )}
-                                                                    </div>
-                                                                    {/* Financial */}
-                                                                    <div className="bg-black/30 border border-white/[0.06] rounded-2xl p-6">
-                                                                        <h4 className="text-[13px] font-bold mb-4 flex items-center gap-2"><DollarSign className="w-4 h-4 text-[#00E676]" /> Financial Summary</h4>
-                                                                        <div className="space-y-3">
-                                                                            {[
-                                                                                { l: 'Total Earned', v: `$${(aff.total_earnings || 0).toFixed(2)}`, c: 'text-white' },
-                                                                                { l: 'Already Paid', v: `$${(aff.total_paid || 0).toFixed(2)}`, c: 'text-[#00E676]' },
-                                                                                { l: 'Pending Payout', v: `$${(aff.pending_payout || 0).toFixed(2)}`, c: 'text-orange-400' },
-                                                                            ].map(item => (
-                                                                                <div key={item.l} className="flex justify-between text-[12px] p-3 rounded-xl bg-white/[0.01]">
-                                                                                    <span className="text-white/30">{item.l}</span>
-                                                                                    <span className={`font-bold ${item.c}`}>{item.v}</span>
+                                                                            {(aff.pending_payout || 0) > 0 && method && (
+                                                                                <button onClick={async () => await processPayoutAction(aff.id, aff.pending_payout, method.method_type)}
+                                                                                    className="w-full mt-5 bg-[#00E676]/10 text-[#00E676] border border-[#00E676]/20 hover:bg-[#00E676]/20 rounded-xl py-3 text-[13px] font-bold transition-all flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-[#00E676]/10"><Send className="w-4 h-4" /> Process Payout (${(aff.pending_payout || 0).toFixed(2)})</button>
+                                                                            )}
+                                                                            {pays.length > 0 && (
+                                                                                <div className="mt-5 border-t border-white/[0.06] pt-4">
+                                                                                    <p className="text-[10px] text-white/20 mb-2 font-semibold uppercase tracking-wider">Previous Payouts</p>
+                                                                                    {pays.map((p: any) => (
+                                                                                        <div key={p.id} className="flex justify-between text-[11px] py-1.5"><span className="text-white/20">{new Date(p.created_at).toLocaleDateString()}</span><span className={p.status === 'completed' ? 'text-[#00E676] font-semibold' : 'text-amber-400'}>${p.amount.toFixed(2)} • {p.status}</span></div>
+                                                                                    ))}
                                                                                 </div>
-                                                                            ))}
+                                                                            )}
                                                                         </div>
-                                                                        {(aff.pending_payout || 0) > 0 && method && (
-                                                                            <button onClick={async () => await processPayoutAction(aff.id, aff.pending_payout, method.method_type)}
-                                                                                className="w-full mt-5 bg-[#00E676]/10 text-[#00E676] border border-[#00E676]/20 hover:bg-[#00E676]/20 rounded-xl py-3 text-[13px] font-bold transition-all flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-[#00E676]/10"><Send className="w-4 h-4" /> Process Payout (${(aff.pending_payout || 0).toFixed(2)})</button>
-                                                                        )}
-                                                                        {pays.length > 0 && (
-                                                                            <div className="mt-5 border-t border-white/[0.06] pt-4">
-                                                                                <p className="text-[10px] text-white/20 mb-2 font-semibold uppercase tracking-wider">Previous Payouts</p>
-                                                                                {pays.map((p: any) => (
-                                                                                    <div key={p.id} className="flex justify-between text-[11px] py-1.5"><span className="text-white/20">{new Date(p.created_at).toLocaleDateString()}</span><span className={p.status === 'completed' ? 'text-[#00E676] font-semibold' : 'text-amber-400'}>${p.amount.toFixed(2)} • {p.status}</span></div>
-                                                                                ))}
-                                                                            </div>
-                                                                        )}
                                                                     </div>
-                                                                </div>
                                                             </motion.div>
                                                         </td></tr>)}
                                                     </Fragment>
