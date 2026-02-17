@@ -341,30 +341,30 @@ export function AdminDashboard({ affiliates, allReferrals, allPayoutMethods, all
                                                                                 {method.method_type === "bank_transfer" && (
                                                                                     <>
                                                                                         <div className="space-y-3">
-                                                                                            <div><p className="text-[10px] text-white/25 uppercase font-semibold">Bank Name</p><p className="text-[12px] font-medium text-white/90">{method.bank_name || "—"}</p></div>
-                                                                                            <div><p className="text-[10px] text-white/25 uppercase font-semibold">Account Name</p><p className="text-[12px] font-medium text-white/90">{method.account_name || "—"}</p></div>
+                                                                                            <div><p className="text-[10px] text-white/25 uppercase font-semibold">Bank Name</p><p className="text-[12px] font-medium text-white/90">{method.details?.bank_name || "—"}</p></div>
+                                                                                            <div><p className="text-[10px] text-white/25 uppercase font-semibold">Account Name</p><p className="text-[12px] font-medium text-white/90">{method.details?.account_holder || "—"}</p></div>
                                                                                         </div>
                                                                                         <div className="space-y-3">
                                                                                             <div>
                                                                                                 <p className="text-[10px] text-white/25 uppercase font-semibold">Account Number / IBAN</p>
                                                                                                 <div className="flex items-center gap-2 group/iban">
-                                                                                                    <p className="text-[12px] font-mono text-white/90">{method.account_number || "—"}</p>
-                                                                                                    {method.account_number && <button onClick={() => navigator.clipboard.writeText(method.account_number)} className="opacity-0 group-hover/iban:opacity-100 text-[10px] text-[#00E676] hover:underline">Copy</button>}
+                                                                                                    <p className="text-[12px] font-mono text-white/90">{method.details?.account_number || "—"}</p>
+                                                                                                    {method.details?.account_number && <button onClick={() => navigator.clipboard.writeText(method.details.account_number)} className="opacity-0 group-hover/iban:opacity-100 text-[10px] text-[#00E676] hover:underline">Copy</button>}
                                                                                                 </div>
                                                                                             </div>
-                                                                                            <div><p className="text-[10px] text-white/25 uppercase font-semibold">Swift / BIC</p><p className="text-[12px] font-mono text-white/90">{method.swift_code || "—"}</p></div>
+                                                                                            <div><p className="text-[10px] text-white/25 uppercase font-semibold">Swift / BIC</p><p className="text-[12px] font-mono text-white/90">{method.details?.routing_number || "—"}</p></div>
                                                                                         </div>
                                                                                     </>
                                                                                 )}
 
                                                                                 {method.method_type === "crypto" && (
                                                                                     <>
-                                                                                        <div><p className="text-[10px] text-white/25 uppercase font-semibold">Network</p><p className="text-[12px] font-bold text-[#00E676]">{method.crypto_network || "TRC20"}</p></div>
+                                                                                        <div><p className="text-[10px] text-white/25 uppercase font-semibold">Network</p><p className="text-[12px] font-bold text-[#00E676]">{method.details?.network || "TRC20"}</p></div>
                                                                                         <div className="col-span-2">
                                                                                             <p className="text-[10px] text-white/25 uppercase font-semibold mb-1">Wallet Address</p>
                                                                                             <div className="flex items-center gap-3 bg-black/40 p-3 rounded-xl border border-white/[0.06]">
-                                                                                                <code className="text-[11px] font-mono text-white/90 break-all select-all">{method.crypto_wallet_address || "No address provided"}</code>
-                                                                                                {method.crypto_wallet_address && <button onClick={() => navigator.clipboard.writeText(method.crypto_wallet_address)} className="text-[11px] font-bold text-[#00E676] hover:underline whitespace-nowrap ml-auto px-2">Copy</button>}
+                                                                                                <code className="text-[11px] font-mono text-white/90 break-all select-all">{method.details?.wallet_address || "No address provided"}</code>
+                                                                                                {method.details?.wallet_address && <button onClick={() => navigator.clipboard.writeText(method.details.wallet_address)} className="text-[11px] font-bold text-[#00E676] hover:underline whitespace-nowrap ml-auto px-2">Copy</button>}
                                                                                             </div>
                                                                                         </div>
                                                                                     </>
@@ -374,8 +374,8 @@ export function AdminDashboard({ affiliates, allReferrals, allPayoutMethods, all
                                                                                     <div className="col-span-2">
                                                                                         <p className="text-[10px] text-white/25 uppercase font-semibold mb-1">PayPal Email</p>
                                                                                         <div className="flex items-center gap-3 bg-black/40 p-3 rounded-xl border border-white/[0.06]">
-                                                                                            <span className="text-[12px] text-white/90">{method.paypal_email || "No email provided"}</span>
-                                                                                            {method.paypal_email && <button onClick={() => navigator.clipboard.writeText(method.paypal_email)} className="text-[11px] font-bold text-[#00E676] hover:underline whitespace-nowrap ml-auto">Copy</button>}
+                                                                                            <span className="text-[12px] text-white/90">{method.details?.email || "No email provided"}</span>
+                                                                                            {method.details?.email && <button onClick={() => navigator.clipboard.writeText(method.details.email)} className="text-[11px] font-bold text-[#00E676] hover:underline whitespace-nowrap ml-auto">Copy</button>}
                                                                                         </div>
                                                                                     </div>
                                                                                 )}

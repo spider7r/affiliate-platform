@@ -7,12 +7,13 @@ import {
     LayoutDashboard, Link2, Wallet, Settings, LogOut, ChevronRight,
     CreditCard, Building2, Bitcoin, Plus, ArrowUpRight, ArrowDownRight,
     Eye, EyeOff, ExternalLink, Send, Trash2, CheckCircle2, Clock,
-    ShieldCheck, Sparkles, Target, BarChart3
+    ShieldCheck, Sparkles, Target, BarChart3, Pencil
 } from 'lucide-react'
-import { addPayoutMethod, logoutAffiliate } from '@/app/actions'
+import { addPayoutMethod, logoutAffiliate, removePayoutMethod, updatePayoutMethod } from '@/app/actions'
 import Image from 'next/image'
 import EarningsCalculator from './dashboard/EarningsCalculator'
 import EarningsChart from './dashboard/EarningsChart'
+import ConfirmationModal from './ConfirmationModal'
 
 interface DashboardProps {
     affiliate: any
@@ -31,6 +32,51 @@ export function Dashboard({ affiliate, referralCount, clickCount, recentReferral
     const [activePage, setActivePage] = useState<ActivePage>('overview')
     const [showEarnings, setShowEarnings] = useState(true)
     const [addingMethod, setAddingMethod] = useState<string | null>(null)
+
+    // Edit & Delete State
+    const [editingMethod, setEditingMethod] = useState<any | null>(null)
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+    const [methodToDelete, setMethodToDelete] = useState<string | null>(null)
+    const [isDeleting, setIsDeleting] = useState(false)
+
+    const initiateDelete = (id: string) => {
+        setMethodToDelete(id)
+        setIsDeleteModalOpen(true)
+    }
+
+    const confirmDelete = async () => {
+        if (!methodToDelete) return
+        setIsDeleting(true)
+        const res = await removePayoutMethod(methodToDelete)
+        setIsDeleting(false)
+        setIsDeleteModalOpen(false)
+        setMethodToDelete(null)
+        if (res?.error) alert(res.error)
+    }
+
+    const initiateEdit = (method: any) => {
+        setEditingMethod(method)
+        setAddingMethod(method.method_type)
+    }
+
+    const cancelEdit = () => {
+        setEditingMethod(null)
+        setAddingMethod(null)
+    }
+
+    const handleFormSubmit = async (formData: FormData) => {
+        if (editingMethod) {
+            formData.append('method_id', editingMethod.id)
+            const res = await updatePayoutMethod(formData)
+            if (res?.error) alert(res.error)
+            if (res?.success) cancelEdit()
+        } else {
+            const res = await addPayoutMethod(formData)
+            if (res?.error) alert(res.error)
+            if (res?.success) setAddingMethod(null)
+        }
+    }
+
     const referralLink = `https://thetradal.com?ref=${affiliate.code}`
 
     // Chart data processing
@@ -358,7 +404,20 @@ export function Dashboard({ affiliate, referralCount, clickCount, recentReferral
                                                     </div>
                                                     <div className="flex items-center gap-3">
                                                         {m.is_primary && <span className="text-[9px] bg-[#00E676]/10 text-[#00E676] px-3 py-1 rounded-full uppercase font-bold border border-[#00E676]/20">Primary</span>}
-                                                        <button className="p-2 hover:bg-red-500/10 rounded-xl transition-colors"><Trash2 className="w-4 h-4 text-white/20 hover:text-red-400" /></button>
+
+                                                        <button
+                                                            onClick={() => initiateEdit(m)}
+                                                            className="p-2 hover:bg-blue-500/10 rounded-xl transition-colors"
+                                                        >
+                                                            <Pencil className="w-4 h-4 text-white/20 hover:text-blue-400" />
+                                                        </button>
+
+                                                        <button
+                                                            onClick={() => initiateDelete(m.id)}
+                                                            className="p-2 hover:bg-red-500/10 rounded-xl transition-colors"
+                                                        >
+                                                            <Trash2 className="w-4 h-4 text-white/20 hover:text-red-400" />
+                                                        </button>
                                                     </div>
                                                 </div>
                                             ))}
@@ -367,11 +426,20 @@ export function Dashboard({ affiliate, referralCount, clickCount, recentReferral
 
                                     <div className="grid grid-cols-3 gap-4">
                                         {[
-                                            { type: 'bank_transfer', label: 'Bank Transfer', icon: Building2, desc: 'Direct bank deposit', tag: 'Recommended' },
+                                            { type: 'crypto', label: 'Crypto (USDT)', icon: Bitcoin, desc: 'TRC-20 / ERC-20', tag: 'Recommended' },
                                             { type: 'paypal', label: 'PayPal', icon: CreditCard, desc: 'Instant transfer', tag: null },
-                                            { type: 'crypto', label: 'Crypto (USDT)', icon: Bitcoin, desc: 'TRC-20 / ERC-20', tag: 'Fast' },
+                                            { type: 'bank_transfer', label: 'Bank Transfer', icon: Building2, desc: '2-5 business days', tag: null },
                                         ].map(m => (
-                                            <button key={m.type} onClick={() => setAddingMethod(addingMethod === m.type ? null : m.type)}
+                                            <button key={m.type} onClick={() => {
+                                                if (editingMethod && addingMethod === m.type) {
+                                                    cancelEdit()
+                                                } else if (addingMethod === m.type) {
+                                                    setAddingMethod(null)
+                                                } else {
+                                                    setAddingMethod(m.type)
+                                                    setEditingMethod(null)
+                                                }
+                                            }}
                                                 className={`rounded-2xl p-5 text-left group cursor-pointer transition-all duration-300 border ${addingMethod === m.type ? 'border-[#00E676]/30 bg-[#00E676]/[0.03]' : 'border-white/[0.06] bg-white/[0.01] hover:border-white/[0.12] hover:bg-white/[0.02]'}`}>
                                                 <div className="flex items-start justify-between mb-3">
                                                     <div className="w-11 h-11 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center group-hover:border-[#00E676]/20"><m.icon className="w-5 h-5 text-[#00E676]" /></div>
@@ -387,20 +455,33 @@ export function Dashboard({ affiliate, referralCount, clickCount, recentReferral
                                     <AnimatePresence>
                                         {addingMethod && (
                                             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-                                                <form action={async (formData) => {
-                                                    const res = await addPayoutMethod(formData)
-                                                    if (res?.error) alert(res.error) // Simple alert for now, can be toast
-                                                    if (res?.success) setAddingMethod(null)
-                                                }} className="border border-white/[0.06] bg-white/[0.01] rounded-2xl p-6 mt-5 space-y-4">
+                                                <form action={handleFormSubmit} key={editingMethod?.id || 'new'} className="border border-white/[0.06] bg-white/[0.01] rounded-2xl p-6 mt-5 space-y-4">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <h4 className="text-[13px] font-bold text-[#00E676]">
+                                                            {editingMethod ? `Edit ${addingMethod.replace('_', ' ')}` : `Add ${addingMethod.replace('_', ' ')}`}
+                                                        </h4>
+                                                        {editingMethod && (
+                                                            <button type="button" onClick={cancelEdit} className="text-[10px] text-white/40 hover:text-white">Cancel Edit</button>
+                                                        )}
+                                                    </div>
+
                                                     <input type="hidden" name="method_type" value={addingMethod} />
                                                     {addingMethod === 'bank_transfer' && (<div className="grid grid-cols-2 gap-4">
-                                                        {[{ n: 'bank_name', l: 'Bank Name', p: 'e.g. JPMorgan Chase' }, { n: 'account_holder', l: 'Account Holder', p: 'Full name' }, { n: 'account_number', l: 'Account Number', p: 'Account number' }, { n: 'routing_number', l: 'Routing Number', p: 'Routing number' }].map(f => (
-                                                            <div key={f.n}><label className="text-[10px] text-white/30 uppercase tracking-wider block mb-2 font-semibold">{f.l}</label><input name={f.n} required className="w-full bg-black/40 border border-white/[0.08] rounded-xl px-4 py-2.5 text-[13px] focus:outline-none focus:border-[#00E676]/30 placeholder:text-white/15" placeholder={f.p} /></div>
+                                                        {[
+                                                            { n: 'bank_name', l: 'Bank Name', p: 'e.g. JPMorgan Chase', v: editingMethod?.details?.bank_name },
+                                                            { n: 'account_holder', l: 'Account Holder', p: 'Full name', v: editingMethod?.details?.account_holder },
+                                                            { n: 'account_number', l: 'Account Number', p: 'Account number', v: editingMethod?.details?.account_number },
+                                                            { n: 'routing_number', l: 'Routing Number', p: 'Routing number', v: editingMethod?.details?.routing_number }
+                                                        ].map(f => (
+                                                            <div key={f.n}><label className="text-[10px] text-white/30 uppercase tracking-wider block mb-2 font-semibold">{f.l}</label><input name={f.n} defaultValue={f.v} required className="w-full bg-black/40 border border-white/[0.08] rounded-xl px-4 py-2.5 text-[13px] focus:outline-none focus:border-[#00E676]/30 placeholder:text-white/15" placeholder={f.p} /></div>
                                                         ))}
                                                     </div>)}
-                                                    {addingMethod === 'paypal' && (<div><label className="text-[10px] text-white/30 uppercase tracking-wider block mb-2 font-semibold">PayPal Email</label><input name="paypal_email" type="email" required className="w-full bg-black/40 border border-white/[0.08] rounded-xl px-4 py-2.5 text-[13px] focus:outline-none focus:border-[#00E676]/30 placeholder:text-white/15" placeholder="your@email.com" /></div>)}
-                                                    {addingMethod === 'crypto' && (<div className="space-y-4"><div><label className="text-[10px] text-white/30 uppercase tracking-wider block mb-2 font-semibold">Wallet Address</label><input name="wallet_address" required className="w-full bg-black/40 border border-white/[0.08] rounded-xl px-4 py-2.5 text-[13px] font-mono focus:outline-none focus:border-[#00E676]/30 placeholder:text-white/15" placeholder="USDT wallet address" /></div><div><label className="text-[10px] text-white/30 uppercase tracking-wider block mb-2 font-semibold">Network</label><select name="network" className="w-full bg-black/40 border border-white/[0.08] rounded-xl px-4 py-2.5 text-[13px] focus:outline-none focus:border-[#00E676]/30"><option value="TRC-20">TRC-20 (Tron)</option><option value="ERC-20">ERC-20 (Ethereum)</option><option value="BEP-20">BEP-20 (BSC)</option></select></div></div>)}
-                                                    <button type="submit" className="w-full bg-[#00E676]/10 text-[#00E676] border border-[#00E676]/20 hover:bg-[#00E676]/20 rounded-xl py-3 text-[13px] font-bold transition-all flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-[#00E676]/10"><Plus className="w-4 h-4" /> Save Payout Method</button>
+                                                    {addingMethod === 'paypal' && (<div><label className="text-[10px] text-white/30 uppercase tracking-wider block mb-2 font-semibold">PayPal Email</label><input name="paypal_email" type="email" defaultValue={editingMethod?.details?.email} required className="w-full bg-black/40 border border-white/[0.08] rounded-xl px-4 py-2.5 text-[13px] focus:outline-none focus:border-[#00E676]/30 placeholder:text-white/15" placeholder="your@email.com" /></div>)}
+                                                    {addingMethod === 'crypto' && (<div className="space-y-4"><div><label className="text-[10px] text-white/30 uppercase tracking-wider block mb-2 font-semibold">Wallet Address</label><input name="wallet_address" defaultValue={editingMethod?.details?.wallet_address} required className="w-full bg-black/40 border border-white/[0.08] rounded-xl px-4 py-2.5 text-[13px] font-mono focus:outline-none focus:border-[#00E676]/30 placeholder:text-white/15" placeholder="USDT wallet address" /></div><div><label className="text-[10px] text-white/30 uppercase tracking-wider block mb-2 font-semibold">Network</label><select name="network" defaultValue={editingMethod?.details?.network} className="w-full bg-black/40 border border-white/[0.08] rounded-xl px-4 py-2.5 text-[13px] focus:outline-none focus:border-[#00E676]/30"><option value="TRC-20">TRC-20 (Tron)</option><option value="ERC-20">ERC-20 (Ethereum)</option><option value="BEP-20">BEP-20 (BSC)</option></select></div></div>)}
+                                                    <button type="submit" className="w-full bg-[#00E676]/10 text-[#00E676] border border-[#00E676]/20 hover:bg-[#00E676]/20 rounded-xl py-3 text-[13px] font-bold transition-all flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-[#00E676]/10">
+                                                        {editingMethod ? <Pencil className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                                                        {editingMethod ? 'Update Method' : 'Save Payout Method'}
+                                                    </button>
                                                 </form>
                                             </motion.div>
                                         )}
@@ -494,6 +575,14 @@ export function Dashboard({ affiliate, referralCount, clickCount, recentReferral
                     </AnimatePresence>
                 </div>
             </main>
+            <ConfirmationModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={confirmDelete}
+                title="Delete Payout Method?"
+                message="Are you sure you want to delete this payout method? This action cannot be undone."
+                isLoading={isDeleting}
+            />
         </div>
     )
 }

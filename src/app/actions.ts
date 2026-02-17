@@ -229,3 +229,68 @@ export async function removePayoutMethod(methodId: string) {
     revalidatePath('/')
     return { success: true }
 }
+
+export async function updatePayoutMethod(formData: FormData) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: 'Not authenticated' }
+
+    const adminClient = createAdminClient()
+
+    // Get method ID
+    const methodId = formData.get('method_id') as string
+    if (!methodId) return { error: 'Method ID is required' }
+
+    // Verify ownership
+    const { data: method } = await adminClient
+        .from('payout_methods')
+        .select('affiliate_id')
+        .eq('id', methodId)
+        .single()
+
+    if (!method) return { error: 'Method not found' }
+
+    const { data: affiliate } = await adminClient
+        .from('affiliates')
+        .select('id')
+        .eq('user_id', user.id)
+        .single()
+
+    if (!affiliate || affiliate.id !== method.affiliate_id) {
+        return { error: 'Unauthorized' }
+    }
+
+    const methodType = formData.get('method_type') as string
+    const details: Record<string, string> = {}
+
+    if (methodType === 'bank_transfer') {
+        details.bank_name = formData.get('bank_name') as string
+        details.account_holder = formData.get('account_holder') as string
+        details.account_number = formData.get('account_number') as string
+        details.routing_number = formData.get('routing_number') as string
+    } else if (methodType === 'paypal') {
+        details.email = formData.get('paypal_email') as string
+    } else if (methodType === 'crypto') {
+        details.wallet_address = formData.get('wallet_address') as string
+        details.network = formData.get('network') as string
+    }
+
+    // Validate
+    if (methodType === 'bank_transfer' && !details.account_number) return { error: 'Account number is required' }
+    if (methodType === 'paypal' && !details.email) return { error: 'PayPal email is required' }
+    if (methodType === 'crypto' && !details.wallet_address) return { error: 'Wallet address is required' }
+
+    // Update
+    const { error } = await adminClient
+        .from('payout_methods')
+        .update({
+            details: details,
+            updated_at: new Date().toISOString()
+        })
+        .eq('id', methodId)
+
+    if (error) return { error: error.message }
+
+    revalidatePath('/')
+    return { success: true }
+}
