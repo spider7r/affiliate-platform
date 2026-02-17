@@ -10,6 +10,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Tradal Partners | Affiliate Dashboard",
   description: "Your partner dashboard for tracking referrals, earnings, and payouts.",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
